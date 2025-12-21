@@ -221,13 +221,12 @@ export default function QuestionsPage() {
 
                         <div className="space-y-2 font-bold text-red-400 text-lg tracking-[0.2em] animate-pulse">
                             <p>{`> ENCRYPTION KEY MISMATCH`}</p>
-                            <p>{`> TRACING IP ADDRESS...`}</p>
                             <p>{`> LOCKING DOWN SYSTEM...`}</p>
                         </div>
 
                         <div className="mt-8">
                             <div className="inline-block border border-red-600 text-red-600 px-6 py-2 text-lg font-bold uppercase tracking-widest bg-black/80 animate-bounce">
-                                SECURITY BREACH DETECTED
+                                ENTER CORRECT PASSWORD
                             </div>
                         </div>
                     </div>
