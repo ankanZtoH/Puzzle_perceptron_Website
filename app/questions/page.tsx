@@ -9,55 +9,55 @@ const levels = [
         id: 1,
         name: "Initialization",
         questions: [
-            { id: 1, q: "What is the output of: console.log(typeof NaN)?", p: "Output?", a: "Number" }, // N
-            { id: 2, q: "I have cities, but no houses. I have mountains, but no trees. I have water, but no fish. What am I?", p: "Riddle...", a: "Map" }, // M
-            { id: 3, q: "What is 2 + 2 in base 4?", p: "Calculate...", a: "10" }, // 1
-            { id: 4, q: "The more you take, the more you leave behind. What am I?", p: "Riddle...", a: "Footsteps" }, // F
-            { id: 5, q: "What protocol is used for secure web browsing?", p: "Acronym...", a: "HTTPS" }, // H
+            { id: 1, type: "mcq", q: "What is the output of: console.log(typeof NaN)?", options: ["Number", "String", "NaN", "Undefined"], a: "Number" }, // N
+            { id: 2, type: "text", q: "I have cities, but no houses. I have mountains, but no trees. I have water, but no fish. What am I?", p: "Riddle...", a: "Map" }, // M
+            { id: 3, type: "mcq", q: "What is 2 + 2 in base 4?", options: ["4", "10", "11", "22"], a: "10" }, // 1
+            { id: 4, type: "text", q: "The more you take, the more you leave behind. What am I?", p: "Riddle...", a: "Footsteps" }, // F
+            { id: 5, type: "mcq", q: "What protocol is used for secure web browsing?", options: ["HTTP", "FTP", "HTTPS", "SMTP"], a: "HTTPS" }, // H
         ]
     },
     {
         id: 2,
         name: "Extraction",
         questions: [
-            { id: 1, q: "Which data structure follows LIFO?", p: "Type...", a: "Stack" }, // S
-            { id: 2, q: "What comes once in a minute, twice in a moment, but never in a thousand years?", p: "Riddle...", a: "M" }, // M
-            { id: 3, q: "What converts high-level code to machine code all at once?", p: "Tool...", a: "Compiler" }, // C
-            { id: 4, q: "Who is the 'father of the computer'?", p: "Name...", a: "Babbage" }, // B
-            { id: 5, q: "I speak without a mouth and hear without ears. What am I?", p: "Riddle...", a: "Echo" }, // E
+            { id: 1, type: "text", q: "Which data structure follows LIFO?", p: "Type...", a: "Stack" }, // S
+            { id: 2, type: "text", q: "What comes once in a minute, twice in a moment, but never in a thousand years?", p: "Riddle...", a: "M" }, // M
+            { id: 3, type: "text", q: "What converts high-level code to machine code all at once?", p: "Tool...", a: "Compiler" }, // C
+            { id: 4, type: "text", q: "Who is the 'father of the computer'?", p: "Name...", a: "Babbage" }, // B
+            { id: 5, type: "text", q: "I speak without a mouth and hear without ears. What am I?", p: "Riddle...", a: "Echo" }, // E
         ]
     },
     {
         id: 3,
         name: "Decryption",
         questions: [
-            { id: 1, q: "What key is used to refresh a page?", p: "Key...", a: "F5" }, // F
-            { id: 2, q: "What do you call a function that calls itself?", p: "Concept...", a: "Recursive" }, // R
-            { id: 3, q: "Binary representation of 5?", p: "Bits...", a: "101" }, // 1
-            { id: 4, q: "What is the main circuit board in a computer?", p: "Hardware...", a: "Motherboard" }, // M
-            { id: 5, q: "I have keys but no locks. I have a space but no room. You can enter, but can't go outside. What am I?", p: "Device...", a: "Keyboard" }, // K
+            { id: 1, type: "text", q: "What key is used to refresh a page?", p: "Key...", a: "F5" }, // F
+            { id: 2, type: "text", q: "What do you call a function that calls itself?", p: "Concept...", a: "Recursive" }, // R
+            { id: 3, type: "text", q: "Binary representation of 5?", p: "Bits...", a: "101" }, // 1
+            { id: 4, type: "text", q: "What is the main circuit board in a computer?", p: "Hardware...", a: "Motherboard" }, // M
+            { id: 5, type: "text", q: "I have keys but no locks. I have a space but no room. You can enter, but can't go outside. What am I?", p: "Device...", a: "Keyboard" }, // K
         ]
     },
     {
         id: 4,
         name: "Firewall Breach",
         questions: [
-            { id: 1, q: "Protocol for sending emails?", p: "Acronym...", a: "SMTP" }, // S
-            { id: 2, q: "What acts as a bridge between the OS and hardware?", p: "Concept...", a: "Kernel" }, // K
-            { id: 3, q: "In OOP, what concept hides implementation details?", p: "Concept...", a: "Encapsulation" }, // E
-            { id: 4, q: "Default HTTP port?", p: "Number...", a: "80" }, // 8
-            { id: 5, q: "Language of the web?", p: "Language...", a: "HTML" }, // H
+            { id: 1, type: "text", q: "Protocol for sending emails?", p: "Acronym...", a: "SMTP" }, // S
+            { id: 2, type: "text", q: "What acts as a bridge between the OS and hardware?", p: "Concept...", a: "Kernel" }, // K
+            { id: 3, type: "text", q: "In OOP, what concept hides implementation details?", p: "Concept...", a: "Encapsulation" }, // E
+            { id: 4, type: "text", q: "Default HTTP port?", p: "Number...", a: "80" }, // 8
+            { id: 5, type: "text", q: "Language of the web?", p: "Language...", a: "HTML" }, // H
         ]
     },
     {
         id: 5,
         name: "System Core",
         questions: [
-            { id: 1, q: "What does 'CPU' stand for (first word)?", p: "Word...", a: "Central" }, // C
-            { id: 2, q: "Smallest unit of data in a computer?", p: "Unit...", a: "Bit" }, // B
-            { id: 3, q: "What is the opposite of 'upload'?", p: "Action...", a: "Download" }, // D
-            { id: 4, q: "Name of the first electronic general-purpose computer?", p: "Acronym...", a: "ENIAC" }, // E
-            { id: 5, q: "Volatile memory is known as?", p: "Acronym...", a: "RAM" }, // R
+            { id: 1, type: "text", q: "What does 'CPU' stand for (first word)?", p: "Word...", a: "Central" }, // C
+            { id: 2, type: "text", q: "Smallest unit of data in a computer?", p: "Unit...", a: "Bit" }, // B
+            { id: 3, type: "text", q: "What is the opposite of 'upload'?", p: "Action...", a: "Download" }, // D
+            { id: 4, type: "text", q: "Name of the first electronic general-purpose computer?", p: "Acronym...", a: "ENIAC" }, // E
+            { id: 5, type: "text", q: "Volatile memory is known as?", p: "Acronym...", a: "RAM" }, // R
         ]
     }
 ];
@@ -283,10 +283,10 @@ export default function QuestionsPage() {
                             <div className="inline-block mb-6 px-3 py-1 bg-red-900/20 text-red-500 text-sm font-medium animate-pulse font-mono tracking-widest">
                                 SECURITY LAYER: {currentLevel.name.toUpperCase()}
                             </div>
-                            <h1 className="text-6xl md:text-8xl font-black mb-6 tracking-tighter text-white drop-shadow-2xl">
+                            <h1 className="text-6xl md:text-7xl font-black mb-3 tracking-tighter text-white drop-shadow-2xl">
                                 THE GAUNTLET
                             </h1>
-                            <p className="text-zinc-400 text-xl md:text-2xl max-w-2xl mx-auto leading-relaxed">
+                            <p className="text-zinc-400 text-sm md:text-    xl max-w-2xl mx-auto leading-relaxed">
                                 Solve the riddles. <span className="text-red-500 font-bold">First letter = Password.</span>
                             </p>
                         </header>
@@ -304,14 +304,40 @@ export default function QuestionsPage() {
                                                     {q.q}
                                                 </label>
                                                 <div className="relative group/input">
-                                                    <input
-                                                        type="text"
-                                                        id={`q-${q.id}`}
-                                                        placeholder={q.p}
-                                                        value={answers[q.id] || ""}
-                                                        onChange={(e) => handleInputChange(q.id, e.target.value)}
-                                                        className="w-full bg-transparent border-b border-zinc-800 px-0 py-3 text-lg text-white placeholder-zinc-700 focus:outline-none focus:border-red-600 transition-all duration-300 font-mono"
-                                                    />
+                                                    {q.type === 'mcq' && q.options ? (
+                                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                                                            {q.options.map((option) => (
+                                                                <button
+                                                                    key={option}
+                                                                    type="button"
+                                                                    onClick={() => handleInputChange(q.id, option)}
+                                                                    className={`px-6 py-4 text-left font-mono text-lg transition-all duration-300 border rounded-xl ${answers[q.id] === option
+                                                                        ? 'bg-red-900/40 border-red-500 text-white shadow-[0_0_15px_rgba(220,38,38,0.3)]'
+                                                                        : 'bg-zinc-900/50 border-zinc-700 text-zinc-400 hover:border-zinc-500 hover:bg-zinc-800'
+                                                                        }`}
+                                                                >
+                                                                    <div className="flex items-center gap-3">
+                                                                        <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${answers[q.id] === option ? 'border-red-500' : 'border-zinc-600'
+                                                                            }`}>
+                                                                            {answers[q.id] === option && (
+                                                                                <div className="w-2 h-2 rounded-full bg-red-500" />
+                                                                            )}
+                                                                        </div>
+                                                                        {option}
+                                                                    </div>
+                                                                </button>
+                                                            ))}
+                                                        </div>
+                                                    ) : (
+                                                        <input
+                                                            type="text"
+                                                            id={`q-${q.id}`}
+                                                            placeholder={q.p}
+                                                            value={answers[q.id] || ""}
+                                                            onChange={(e) => handleInputChange(q.id, e.target.value)}
+                                                            className="w-full bg-transparent border-b border-zinc-800 px-0 py-3 text-lg text-white placeholder-zinc-700 focus:outline-none focus:border-red-600 transition-all duration-300 font-mono"
+                                                        />
+                                                    )}
                                                 </div>
                                             </div>
                                         </div>

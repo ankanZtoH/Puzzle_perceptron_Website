@@ -4,7 +4,7 @@ import Link from "next/link";
 export default function Home() {
   return (
     <div className="flex flex-col min-h-screen text-center p-8 bg-black/40 backdrop-blur-[3px]">
-      <h1 className="absolute top-20 left-77 text-8xl md:text-8xl font-black mb-6 tracking-tighter text-white drop-shadow-2xl">
+      <h1 className="absolute top-20 left-40  text-8xl md:text-8xl font-black mb-6 tracking-tighter text-white drop-shadow-2xl">
         PERCEPTRON
       </h1>
 
@@ -12,7 +12,7 @@ export default function Home() {
         Crack the code. <br className="hidden md:block" />
         Unlock the door.
       </h1> */}
-      <Link href="/puzzle" passHref className="absolute bottom-40 left-130 ">
+      <Link href="/puzzle" passHref className="absolute bottom-30 left-90 ">
         <button className="group relative px-8 py-4 bg-yellow-400 text-black font-bold text-xl rounded-full overflow-hidden transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2 focus:ring-offset-black">
           <span className="relative z-10 group-hover:text-black transition-colors cursor-pointer">Let's Go</span>
         </button>
