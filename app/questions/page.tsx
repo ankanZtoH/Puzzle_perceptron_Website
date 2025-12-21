@@ -249,6 +249,10 @@ export default function QuestionsPage() {
                             ACCESS GRANTED
                         </h2>
 
+                        <h3 className="text-3xl md:text-5xl font-bold text-green-400 mb-8 tracking-[0.5em] animate-pulse drop-shadow-[0_0_10px_rgba(74,222,128,0.5)]">
+                            LEVEL {currentLevel.id} CLEARED
+                        </h3>
+
                         <div className="w-full bg-green-900/30 h-4 mt-8 overflow-hidden rounded-none border border-green-500/50">
                             <div className="h-full bg-green-500 animate-[progress_2s_steps(20)_forwards] shadow-[0_0_10px_#22c55e]"></div>
                         </div>

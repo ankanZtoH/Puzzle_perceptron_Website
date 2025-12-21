@@ -109,7 +109,7 @@ export default function NamePage() {
                     </div>
                     <button
                         type="submit"
-                        className="w-full py-4 bg-yellow-400 hover:bg-yellow-300 text-black font-bold text-lg rounded-xl transition-all transform hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-yellow-400/20"
+                        className="w-full py-4 bg-yellow-400 hover:bg-yellow-300 text-black font-bold text-lg rounded-xl transition-all transform hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-yellow-400/20 cursor-pointer"
                     >
                         Continue
                     </button>
