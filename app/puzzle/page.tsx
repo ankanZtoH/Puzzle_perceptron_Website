@@ -14,7 +14,7 @@ export default function NamePage() {
             setIsLoading(true);
             // Simulate "Accessing" delay
             await new Promise((resolve) => setTimeout(resolve, 3000));
-            router.push("/questions");
+            router.push("/rules");
         }
     };
 
