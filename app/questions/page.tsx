@@ -10,7 +10,7 @@ import TokenStatus from "@/components/TokenStatus"; // Import TokenStatus
 const levels = [
     {
         id: 1,
-        name: "Initialization",
+        name: "Level 1",
         questions: [
             {
                 id: 1,
@@ -61,7 +61,7 @@ const levels = [
     },
     {
         id: 2,
-        name: "Extraction",
+        name: "Level 2",
         questions: [
             {
                 id: 1,
@@ -112,7 +112,7 @@ const levels = [
     },
     {
         id: 3,
-        name: "Decryption",
+        name: "Level 3",
         questions: [
             {
                 id: 1,
@@ -163,7 +163,7 @@ const levels = [
     },
     {
         id: 4,
-        name: "Firewall Breach",
+        name: "Level 4",
         questions: [
             {
                 id: 1,
@@ -214,7 +214,7 @@ const levels = [
     },
     {
         id: 5,
-        name: "System Core",
+        name: "Level 5",
         questions: [
             {
                 id: 1,
