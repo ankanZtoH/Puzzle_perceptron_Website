@@ -13,6 +13,7 @@ interface GameContextType {
     };
     useToken: (type: TokenType, cost: number) => boolean;
     addReward: (amount: number) => void;
+    resetLevelTokens: (levelIndex: number) => void;
 }
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
@@ -20,10 +21,25 @@ const GameContext = createContext<GameContextType | undefined>(undefined);
 export const GameProvider = ({ children }: { children: React.ReactNode }) => {
     const [rewards, setRewards] = useState(1000);
     const [tokens, setTokens] = useState({
-        easy: 5,
-        hard: 3,
-        skip: 1,
+        easy: 3,
+        hard: 0,
+        skip: 3,
     });
+
+    const resetLevelTokens = (levelIndex: number) => {
+        // Levels 1-3 (index 0-2): Easy only (3)
+        // Levels 4-5 (index 3-4): Easy (3) + Hard (3)
+        // Skip is global, so we preserve its current value
+
+        setTokens(prev => {
+            const isHardLevel = levelIndex >= 3;
+            return {
+                easy: 3,
+                hard: isHardLevel ? 3 : 0,
+                skip: prev.skip // Preserve global skip count
+            };
+        });
+    };
 
     const useToken = (type: TokenType, cost: number): boolean => {
         if (tokens[type] > 0 && rewards >= cost) {
@@ -42,7 +58,7 @@ export const GameProvider = ({ children }: { children: React.ReactNode }) => {
     };
 
     return (
-        <GameContext.Provider value={{ rewards, tokens, useToken, addReward }}>
+        <GameContext.Provider value={{ rewards, tokens, useToken, addReward, resetLevelTokens }}>
             {children}
         </GameContext.Provider>
     );

@@ -314,7 +314,7 @@ const ChipIcon = (props: React.SVGProps<SVGSVGElement>) => (
 
 
 export default function QuestionsPage() {
-    const { useToken, addReward } = useGame(); // Use Global State
+    const { useToken, addReward, resetLevelTokens } = useGame(); // Use Global State
     const router = useRouter(); // Use Router
     const [currentLevelIndex, setCurrentLevelIndex] = useState(0);
     const [passwordInput, setPasswordInput] = useState("");
@@ -348,6 +348,7 @@ export default function QuestionsPage() {
 
     // Reset inputs when level changes
     useEffect(() => {
+        resetLevelTokens(currentLevelIndex); // Reset tokens for the new level
         setAnswers({});
         setPasswordInput("");
         setGuessCount(0); // Reset guess count
@@ -458,12 +459,16 @@ export default function QuestionsPage() {
     return (
         <div className="h-screen w-full bg-black text-white overflow-hidden font-sans selection:bg-red-900 selection:text-white relative">
 
-            <TokenStatus />
+            <TokenStatus
+                showHardToken={currentLevelIndex >= 3}
+                levelName={currentLevel.name.toUpperCase()}
+            />
 
             <TokenModal
                 isOpen={activeTokenQuestion !== null}
                 onClose={() => setActiveTokenQuestion(null)}
                 onSelect={handleTokenSelect}
+                showHardToken={currentLevelIndex >= 3} // Only show Hard Token for Level 4+ (Index 3+)
             />
 
             {/* CLUE MODAL */}
@@ -576,9 +581,6 @@ export default function QuestionsPage() {
                 <div ref={scrollContainerRef} className="flex-1 overflow-y-auto p-4 md:p-8 scrollbar-hide">
                     <div className="max-w-5xl mx-auto pt-16 md:pt-10 pb-20">
                         <header className="mb-20 text-center relative z-10">
-                            <div className="inline-block mb-6 px-3 py-1 bg-red-900/20 text-red-500 text-sm font-medium animate-pulse font-mono tracking-widest">
-                                SECURITY LAYER: {currentLevel.name.toUpperCase()}
-                            </div>
                             <h1 className="text-4xl md:text-7xl font-black mb-3 tracking-tighter text-white drop-shadow-2xl">
                                 THE GAUNTLET
                             </h1>
@@ -605,7 +607,7 @@ export default function QuestionsPage() {
                                                     <button
                                                         type="button"
                                                         onClick={() => setActiveTokenQuestion(q.id)}
-                                                        className="ml-4 px-3 py-1 bg-blue-900/30 text-blue-400 border border-blue-500/30 rounded text-xs md:text-sm font-mono hover:bg-blue-500 hover:text-black transition-colors"
+                                                        className="ml-4 w-15 px-3 py-1 bg-blue-900/30 text-blue-400 border border-blue-500/30 rounded text-xs md:text-xs font-mono hover:bg-blue-500 hover:text-black transition-colors"
                                                     >
                                                         USE TOKEN
                                                     </button>

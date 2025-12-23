@@ -18,6 +18,9 @@ const rajdhani = Rajdhani({
 export const metadata: Metadata = {
   title: "Puzzle Perceptron 2k26",
   description: "Created by perceptron team",
+  icons: {
+    icon: '/favicon.ico',
+  }
 };
 
 export default function RootLayout({

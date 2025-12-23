@@ -7,9 +7,10 @@ interface TokenModalProps {
     isOpen: boolean;
     onClose: () => void;
     onSelect: (type: 'easy' | 'hard' | 'skip') => void;
+    showHardToken?: boolean;
 }
 
-export default function TokenModal({ isOpen, onClose, onSelect }: TokenModalProps) {
+export default function TokenModal({ isOpen, onClose, onSelect, showHardToken = true }: TokenModalProps) {
     const { tokens, rewards } = useGame();
 
     if (!isOpen) return null;
@@ -46,9 +47,9 @@ export default function TokenModal({ isOpen, onClose, onSelect }: TokenModalProp
                     Select a token to bypass security protocols.
                 </p>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="flex flex-col md:flex-row justify-center items-center gap-6">
                     {/* Easy Token */}
-                    <div className="bg-green-900/10 border border-green-500/30 p-4 rounded-lg flex flex-col items-center gap-4 hover:border-green-500 transition-colors">
+                    <div className="w-full md:w-1/3 bg-green-900/10 border border-green-500/30 p-4 rounded-lg flex flex-col items-center gap-4 hover:border-green-500 transition-colors">
                         <div className="text-4xl">🧩</div>
                         <div className="text-center">
                             <h3 className="text-green-500 font-bold text-lg">EASY CLUE</h3>
@@ -72,31 +73,33 @@ export default function TokenModal({ isOpen, onClose, onSelect }: TokenModalProp
                     </div>
 
                     {/* Hard Token */}
-                    <div className="bg-orange-900/10 border border-orange-500/30 p-4 rounded-lg flex flex-col items-center gap-4 hover:border-orange-500 transition-colors">
-                        <div className="text-4xl">🔍</div>
-                        <div className="text-center">
-                            <h3 className="text-orange-500 font-bold text-lg">HARD CLUE</h3>
-                            <p className="text-zinc-400 text-xs mt-1">Reveal a specific detail.</p>
-                        </div>
-                        <div className="mt-auto w-full space-y-2">
-                            <div className="flex justify-between text-xs font-mono text-zinc-300">
-                                <span>COST:</span> <span className="text-yellow-400">100 PTS</span>
+                    {showHardToken && (
+                        <div className="w-full md:w-1/3 bg-orange-900/10 border border-orange-500/30 p-4 rounded-lg flex flex-col items-center gap-4 hover:border-orange-500 transition-colors">
+                            <div className="text-4xl">🔍</div>
+                            <div className="text-center">
+                                <h3 className="text-orange-500 font-bold text-lg">HARD CLUE</h3>
+                                <p className="text-zinc-400 text-xs mt-1">Reveal a specific detail.</p>
                             </div>
-                            <div className="flex justify-between text-xs font-mono text-zinc-300">
-                                <span>REMAINING:</span> <span className="text-white">{tokens.hard}</span>
+                            <div className="mt-auto w-full space-y-2">
+                                <div className="flex justify-between text-xs font-mono text-zinc-300">
+                                    <span>COST:</span> <span className="text-yellow-400">100 PTS</span>
+                                </div>
+                                <div className="flex justify-between text-xs font-mono text-zinc-300">
+                                    <span>REMAINING:</span> <span className="text-white">{tokens.hard}</span>
+                                </div>
+                                <button
+                                    onClick={() => handleSelect('hard', 100)}
+                                    disabled={getButtonState('hard', 100).disabled}
+                                    className={`w-full py-2 font-bold text-sm rounded ${getButtonState('hard', 100).disabled ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed' : 'bg-orange-600 hover:bg-orange-500 text-black'}`}
+                                >
+                                    {getButtonState('hard', 100).text}
+                                </button>
                             </div>
-                            <button
-                                onClick={() => handleSelect('hard', 100)}
-                                disabled={getButtonState('hard', 100).disabled}
-                                className={`w-full py-2 font-bold text-sm rounded ${getButtonState('hard', 100).disabled ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed' : 'bg-orange-600 hover:bg-orange-500 text-black'}`}
-                            >
-                                {getButtonState('hard', 100).text}
-                            </button>
                         </div>
-                    </div>
+                    )}
 
                     {/* Skip Token */}
-                    <div className="bg-red-900/10 border border-red-500/30 p-4 rounded-lg flex flex-col items-center gap-4 hover:border-red-500 transition-colors">
+                    <div className="w-full md:w-1/3 bg-red-900/10 border border-red-500/30 p-4 rounded-lg flex flex-col items-center gap-4 hover:border-red-500 transition-colors">
                         <div className="text-4xl">⏩</div>
                         <div className="text-center">
                             <h3 className="text-red-500 font-bold text-lg">AUTO-SOLVE</h3>
