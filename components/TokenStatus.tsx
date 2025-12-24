@@ -25,8 +25,8 @@ export default function TokenStatus({ showHardToken = true, levelName }: TokenSt
 
 
             <div className="hidden md:block text-right opacity-50 text-[10px]">
-                <div className="w-12 h-12">
-                    <img src="/logo-with-border.svg" alt="" className="w-12 h-12" />
+                <div className="">
+                    <img src="/logo-full.svg" alt="" className="w-50" />
                 </div>
             </div>
 
