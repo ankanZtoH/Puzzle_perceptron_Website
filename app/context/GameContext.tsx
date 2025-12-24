@@ -14,6 +14,8 @@ interface GameContextType {
     useToken: (type: TokenType, cost: number) => boolean;
     addReward: (amount: number) => void;
     resetLevelTokens: (levelIndex: number) => void;
+    isDisqualified: boolean;
+    disqualifyUser: () => void;
 }
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
@@ -25,6 +27,8 @@ export const GameProvider = ({ children }: { children: React.ReactNode }) => {
         hard: 0,
         skip: 3,
     });
+
+    const [isDisqualified, setIsDisqualified] = useState(false);
 
     const resetLevelTokens = (levelIndex: number) => {
         // Levels 1-3 (index 0-2): Easy only (3)
@@ -57,8 +61,20 @@ export const GameProvider = ({ children }: { children: React.ReactNode }) => {
         setRewards(prev => prev + amount);
     };
 
+    const disqualifyUser = () => {
+        setIsDisqualified(true);
+    };
+
     return (
-        <GameContext.Provider value={{ rewards, tokens, useToken, addReward, resetLevelTokens }}>
+        <GameContext.Provider value={{
+            rewards,
+            tokens,
+            useToken,
+            addReward,
+            resetLevelTokens,
+            isDisqualified,
+            disqualifyUser
+        }}>
             {children}
         </GameContext.Provider>
     );

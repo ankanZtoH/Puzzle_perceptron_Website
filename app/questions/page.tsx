@@ -314,7 +314,7 @@ const ChipIcon = (props: React.SVGProps<SVGSVGElement>) => (
 
 
 export default function QuestionsPage() {
-    const { useToken, addReward, resetLevelTokens } = useGame(); // Use Global State
+    const { useToken, addReward, resetLevelTokens, disqualifyUser, isDisqualified } = useGame(); // Use Global State
     const router = useRouter(); // Use Router
     const [currentLevelIndex, setCurrentLevelIndex] = useState(0);
     const [passwordInput, setPasswordInput] = useState("");
@@ -339,6 +339,30 @@ export default function QuestionsPage() {
 
     // Compute password dynamically
     const levelPassword = currentLevel.questions.map(q => q.a.charAt(0)).join("").toUpperCase();
+
+    // --- TAB SWITCH DETECTION (ANTI-CHEAT) ---
+    useEffect(() => {
+        const handleVisibilityChange = () => {
+            if (document.hidden) {
+                // User switched tabs or minimized window
+                disqualifyUser();
+                router.push("/result");
+            }
+        };
+
+        document.addEventListener("visibilitychange", handleVisibilityChange);
+
+        return () => {
+            document.removeEventListener("visibilitychange", handleVisibilityChange);
+        };
+    }, [disqualifyUser, router]);
+
+    // Check if already disqualified
+    useEffect(() => {
+        if (isDisqualified) {
+            router.push("/result");
+        }
+    }, [isDisqualified, router]);
 
     useEffect(() => {
         if (timeLeft <= 0) return;

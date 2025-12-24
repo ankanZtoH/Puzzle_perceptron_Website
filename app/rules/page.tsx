@@ -22,10 +22,10 @@ export default function RulesPage() {
                 {/* Header */}
                 <header className="mb-10 text-center border-b border-zinc-700 pb-8">
                     <div className="inline-block px-3 py-1 bg-red-900/20 text-red-500 text-xs font-mono tracking-widest mb-4 border border-red-900/30">
-                        PROTOCOL_V2.0.26
+                        READ CAREFULLY
                     </div>
                     <h1 className={`${orbitron.className} text-4xl md:text-6xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white to-zinc-500`}>
-                        RULES OF ENGAGEMENT
+                        RULES
                     </h1>
                 </header>
 
