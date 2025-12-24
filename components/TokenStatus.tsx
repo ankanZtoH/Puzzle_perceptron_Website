@@ -22,13 +22,24 @@ export default function TokenStatus({ showHardToken = true, levelName }: TokenSt
                 </div>
             )}
 
+
+
+            <div className="hidden md:block text-right opacity-50 text-[10px]">
+                <div className="w-12 h-12">
+                    <img src="/logo-with-border.svg" alt="" className="w-12 h-12" />
+                </div>
+            </div>
+
             <div className="flex items-center gap-6">
                 <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-2">
-                    <span className="text-yellow-500 font-bold tracking-widest">REWARDS</span>
+                    <span className="text-yellow-500 font-bold tracking-widest pt-1">POINTS</span>
                     <span className={`${orbitron.className} text-xl md:text-2xl text-white`}>{rewards}</span>
                 </div>
 
+
+
                 <div className="h-8 w-px bg-white/20 hidden md:block"></div>
+
 
                 <div className="flex items-center gap-4">
                     <div className="flex flex-col items-center">
@@ -48,10 +59,7 @@ export default function TokenStatus({ showHardToken = true, levelName }: TokenSt
                 </div>
             </div>
 
-            <div className="hidden md:block text-right opacity-50 text-[10px]">
-                <div>SYS.STATUS: ONLINE</div>
-                <div>SEC_LEVEL: MAX</div>
-            </div>
+
         </div>
     );
 }
