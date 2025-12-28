@@ -332,6 +332,7 @@ export default function QuestionsPage() {
     const [guessCount, setGuessCount] = useState(0);
     const [showLockdown, setShowLockdown] = useState(false);
     const [activeTokenQuestion, setActiveTokenQuestion] = useState<number | null>(null);
+    const [usedClues, setUsedClues] = useState<Record<number, ('easy' | 'hard' | 'skip')[]>>({});
     const [clueMessage, setClueMessage] = useState<string | null>(null);
     const [timeLeft, setTimeLeft] = useState(5400); // 90 minutes
 
@@ -374,6 +375,7 @@ export default function QuestionsPage() {
     useEffect(() => {
         resetLevelTokens(currentLevelIndex); // Reset tokens for the new level
         setAnswers({});
+        setUsedClues({}); // Reset used clues for the new level
         setPasswordInput("");
         setGuessCount(0); // Reset guess count
         if (scrollContainerRef.current) {
@@ -438,6 +440,9 @@ export default function QuestionsPage() {
     const handleTokenSelect = (type: 'easy' | 'hard' | 'skip') => {
         if (activeTokenQuestion === null) return;
 
+        // Check if already used
+        if (usedClues[activeTokenQuestion]?.includes(type)) return;
+
         let cost = 0;
         if (type === 'easy') cost = 50;
         if (type === 'hard') cost = 100;
@@ -457,6 +462,12 @@ export default function QuestionsPage() {
                 handleInputChange(activeTokenQuestion, question.a);
                 setClueMessage("QUESTION BYPASSED. ANSWER INJECTED.");
             }
+
+            // Track used clue
+            setUsedClues(prev => ({
+                ...prev,
+                [activeTokenQuestion]: [...(prev[activeTokenQuestion] || []), type]
+            }));
         }
 
         setActiveTokenQuestion(null);
@@ -493,6 +504,7 @@ export default function QuestionsPage() {
                 onClose={() => setActiveTokenQuestion(null)}
                 onSelect={handleTokenSelect}
                 showHardToken={currentLevelIndex >= 3} // Only show Hard Token for Level 4+ (Index 3+)
+                usedTokens={activeTokenQuestion ? usedClues[activeTokenQuestion] || [] : []}
             />
 
             {/* CLUE MODAL */}

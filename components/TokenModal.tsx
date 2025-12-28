@@ -8,9 +8,10 @@ interface TokenModalProps {
     onClose: () => void;
     onSelect: (type: 'easy' | 'hard' | 'skip') => void;
     showHardToken?: boolean;
+    usedTokens?: ('easy' | 'hard' | 'skip')[];
 }
 
-export default function TokenModal({ isOpen, onClose, onSelect, showHardToken = true }: TokenModalProps) {
+export default function TokenModal({ isOpen, onClose, onSelect, showHardToken = true, usedTokens = [] }: TokenModalProps) {
     const { tokens, rewards } = useGame();
 
     if (!isOpen) return null;
@@ -24,7 +25,9 @@ export default function TokenModal({ isOpen, onClose, onSelect, showHardToken = 
     const getButtonState = (type: 'easy' | 'hard' | 'skip', cost: number) => {
         const hasToken = tokens[type] > 0;
         const canAfford = rewards >= cost;
+        const isUsed = usedTokens.includes(type);
 
+        if (isUsed) return { disabled: true, text: "ALREADY USED" };
         if (!hasToken) return { disabled: true, text: "NO TOKENS" };
         if (!canAfford) return { disabled: true, text: "INSUFFICIENT FUNDS" };
         return { disabled: false, text: "SELECT" };
