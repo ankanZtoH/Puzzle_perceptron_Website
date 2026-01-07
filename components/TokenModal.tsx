@@ -26,8 +26,10 @@ export default function TokenModal({ isOpen, onClose, onSelect, showHardToken = 
         const hasToken = tokens[type] > 0;
         const canAfford = rewards >= cost;
         const isUsed = usedTokens.includes(type);
+        const isSkipped = usedTokens.includes('skip');
 
         if (isUsed) return { disabled: true, text: "ALREADY USED" };
+        if (isSkipped) return { disabled: true, text: "SKIPPED" }; // Disable others if skipped
         if (!hasToken) return { disabled: true, text: "NO TOKENS" };
         if (!canAfford) return { disabled: true, text: "INSUFFICIENT FUNDS" };
         return { disabled: false, text: "SELECT" };
@@ -110,17 +112,17 @@ export default function TokenModal({ isOpen, onClose, onSelect, showHardToken = 
                         </div>
                         <div className="mt-auto w-full space-y-2">
                             <div className="flex justify-between text-xs font-mono text-zinc-300">
-                                <span>COST:</span> <span className="text-yellow-400">200 PTS</span>
+                                <span>COST:</span> <span className="text-yellow-400">250 PTS</span>
                             </div>
                             <div className="flex justify-between text-xs font-mono text-zinc-300">
                                 <span>REMAINING:</span> <span className="text-white">{tokens.skip}</span>
                             </div>
                             <button
-                                onClick={() => handleSelect('skip', 200)}
-                                disabled={getButtonState('skip', 200).disabled}
-                                className={`w-full py-2 font-bold text-sm rounded ${getButtonState('skip', 200).disabled ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed' : 'bg-red-600 hover:bg-red-500 text-black'}`}
+                                onClick={() => handleSelect('skip', 250)}
+                                disabled={getButtonState('skip', 250).disabled}
+                                className={`w-full py-2 font-bold text-sm rounded ${getButtonState('skip', 250).disabled ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed' : 'bg-red-600 hover:bg-red-500 text-black'}`}
                             >
-                                {getButtonState('skip', 200).text}
+                                {getButtonState('skip', 250).text}
                             </button>
                         </div>
                     </div>

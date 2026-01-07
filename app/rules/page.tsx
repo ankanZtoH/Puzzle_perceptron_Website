@@ -3,12 +3,14 @@
 import Link from "next/link";
 import { useState } from "react";
 import { Orbitron, Rajdhani } from 'next/font/google';
+import { useGame } from '../context/GameContext';
 
 const orbitron = Orbitron({ subsets: ["latin"] });
 const rajdhani = Rajdhani({ weight: ["300", "400", "500", "600", "700"], subsets: ["latin"] });
 
 export default function RulesPage() {
     const [accepted, setAccepted] = useState(false);
+    const { userName } = useGame();
 
     return (
         <div className={`min-h-screen bg-black text-white flex flex-col items-center justify-center p-4 md:p-8 relative overflow-hidden selection:bg-red-900 selection:text-white`}>
@@ -22,7 +24,7 @@ export default function RulesPage() {
                 {/* Header */}
                 <header className="mb-10 text-center border-b border-zinc-700 pb-8">
                     <div className="inline-block px-3 py-1 bg-red-900/20 text-red-500 text-xs font-mono tracking-widest mb-4 border border-red-900/30">
-                        READ CAREFULLY
+                        Welcome to Puzzle Competition <span className="text-white font-bold">{userName || 'UNKNOWN'}</span>
                     </div>
                     <h1 className={`${orbitron.className} text-4xl md:text-6xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white to-zinc-500`}>
                         RULES
@@ -30,11 +32,59 @@ export default function RulesPage() {
                 </header>
 
                 {/* Rules List */}
-                <div className={`${rajdhani.className} space-y-6 text-lg md:text-2xl text-zinc-300 font-medium`}>
-                    <RuleItem number="01" title="ZERO TOLERANCE" description="External assistance or AI collaboration is strictly prohibited. Violators will be disqualified." />
-                    <RuleItem number="02" title="TIME CONSTRAINT" description="You have exactly 90 minutes to breach the system. The timer begins immediately upon entry." />
-                    <RuleItem number="03" title="PRECISION" description="All answers are case-insensitive unless specified. Format matters. Read the clues carefully." />
-                    <RuleItem number="04" title="RESOURCE MANAGEMENT" description="Tokens are limited. Use your skips and hints wisely. There is no turning back." />
+                {/* Rules List */}
+                <div className={`${rajdhani.className} space-y-8 text-lg text-zinc-300 font-medium`}>
+                    <RuleItem
+                        number="01"
+                        title="ZERO TOLERANCE"
+                        description="External assistance, answer sharing, or AI collaboration is strictly prohibited. Any violation will result in immediate disqualification."
+                    />
+                    <RuleItem
+                        number="02"
+                        title="TIME CONSTRAINT"
+                        description="You have a strict 90-minute window to breach the system. The countdown begins immediately upon entry. Time is your scarcest resource."
+                    />
+                    <RuleItem
+                        number="03"
+                        title="PRECISION"
+                        description="All answers are case-insensitive but spelling-sensitive. Read every clue with extreme care; details matter."
+                    />
+
+                    {/* Resource Grid for Better Readability */}
+                    <div className="grid md:grid-cols-2 gap-4 my-2">
+                        <RuleItem
+                            number="04"
+                            title="RESOURCE MANAGEMENT"
+                            description={
+                                <div className="space-y-1 mt-2 text-base">
+                                    <div className="flex justify-between border-b border-zinc-700/50 pb-1"><span>Initial Balance:</span> <span className="text-green-400">300 Pts</span></div>
+                                    <div className="flex justify-between border-b border-zinc-700/50 pb-1"><span>Correct Answer:</span> <span className="text-green-400">+80 Pts</span></div>
+                                    <div className="flex justify-between text-zinc-400 pt-1"><span>Usage Costs:</span></div>
+                                    <div className="pl-4 text-sm space-y-1">
+                                        <div className="flex justify-between"><span>Easy Hint:</span> <span className="text-yellow-500">50 Pts</span></div>
+                                        <div className="flex justify-between"><span>Hard Hint:</span> <span className="text-orange-500">100 Pts</span></div>
+                                        <div className="flex justify-between"><span>Skip Level:</span> <span className="text-red-500">250 Pts</span></div>
+                                    </div>
+                                </div>
+                            }
+                        />
+                        <RuleItem
+                            number="05"
+                            title="TOKEN LIMITS"
+                            description={
+                                <div className="space-y-1 mt-2 text-base">
+                                    <div className="font-bold text-zinc-400">Level Allocations (Refreshes per Level):</div>
+                                    <ul className="list-disc list-inside pl-2 space-y-1 text-zinc-300">
+                                        <li><span className="text-zinc-500">Levels 1-3:</span> 2 Easy Tokens</li>
+                                        <li><span className="text-zinc-500">Levels 4-5:</span> 2 Easy + 5 Hard Tokens</li>
+                                    </ul>
+                                    <div className="border-t border-zinc-700/50 pt-2 mt-2">
+                                        <span className="text-zinc-400">Global Limit:</span> 3 Auto-Solve (Skip) tokens total across the entire game.
+                                    </div>
+                                </div>
+                            }
+                        />
+                    </div>
                 </div>
 
                 {/* Action Area */}
@@ -63,8 +113,8 @@ export default function RulesPage() {
 
                         {accepted ? (
                             <Link href="/questions" className="flex-1 md:flex-none">
-                                <button className="w-full md:w-auto px-10 py-4 bg-green-600 hover:bg-green-500 text-black font-bold font-mono tracking-widest shadow-[0_0_20px_rgba(34,197,94,0.4)] transition-all animate-pulse">
-                                    INITIATE SEQUENCE
+                                <button className="w-full md:w-auto px-10 py-4 bg-green-600 hover:bg-green-500 text-black font-bold font-mono tracking-widest shadow-[0_0_20px_rgba(34,197,94,0.4)] transition-all animate-pulse cursor-pointer">
+                                    START
                                 </button>
                             </Link>
                         ) : (
@@ -84,7 +134,7 @@ export default function RulesPage() {
     );
 }
 
-function RuleItem({ number, title, description }: { number: string, title: string, description: string }) {
+function RuleItem({ number, title, description }: { number: string, title: string, description: React.ReactNode }) {
     return (
         <div className="flex gap-4 md:gap-6 items-start group hover:bg-zinc-900/50 p-4 rounded-lg transition-colors border border-transparent hover:border-zinc-800">
             <span className="font-mono text-green-500/50 font-bold text-xl group-hover:text-green-500 transition-colors">
@@ -92,7 +142,7 @@ function RuleItem({ number, title, description }: { number: string, title: strin
             </span>
             <div>
                 <h3 className="text-white font-bold tracking-wider mb-1 group-hover:text-green-400 transition-colors uppercase">{title}</h3>
-                <p className="text-zinc-500 group-hover:text-zinc-400 transition-colors leading-relaxed">{description}</p>
+                <div className="text-zinc-500 group-hover:text-zinc-400 transition-colors leading-relaxed">{description}</div>
             </div>
         </div>
     );

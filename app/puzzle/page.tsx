@@ -2,19 +2,29 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useGame } from '../context/GameContext';
+
+const START_PASSWORD = "perceptron";
 
 export default function NamePage() {
     const [name, setName] = useState("");
+    const [password, setPassword] = useState("");
+    const [error, setError] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
+    const { setUserName } = useGame();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (name.trim()) {
+        setError(""); // Clear previous errors
+        if (name.trim() && password === START_PASSWORD) {
+            setUserName(name.trim());
             setIsLoading(true);
             // Simulate "Accessing" delay
             await new Promise((resolve) => setTimeout(resolve, 3000));
             router.push("/rules");
+        } else if (password !== START_PASSWORD) {
+            setError("Incorrect password. Please ask the organizer for the start password.");
         }
     };
 
@@ -107,6 +117,21 @@ export default function NamePage() {
                             required
                         />
                     </div>
+                    <div className="relative">
+                        <input
+                            type="password"
+                            placeholder="Enter start password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            className="w-full px-6 py-4 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-all"
+                            required
+                        />
+                    </div>
+                    {error && (
+                        <p className="text-red-500 text-sm font-semibold text-center animate-pulse">
+                            {error}
+                        </p>
+                    )}
                     <button
                         type="submit"
                         className="w-full py-4 bg-yellow-400 hover:bg-yellow-300 text-black font-bold text-lg rounded-xl transition-all transform hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-yellow-400/20 cursor-pointer"

@@ -5,57 +5,74 @@ import { useRouter } from "next/navigation";
 import { useGame } from "../context/GameContext"; // Import Global State
 import TokenModal from "@/components/TokenModal"; // Import Token Modal
 import TokenStatus from "@/components/TokenStatus"; // Import TokenStatus
+import "katex/dist/katex.min.css";
+import { InlineMath } from "react-katex";
 
 // --- Game Configurations ---
-const levels = [
+// --- Game Configurations ---
+interface Question {
+    id: number;
+    type: string;
+    q: string;
+    p: string;
+    a: string;
+    easyClue: string | React.ReactNode;
+    hardClue: string;
+    visualComponent?: React.ReactNode;
+    image?: string;
+    options?: string[];
+}
+
+const levels: { id: number; name: string; questions: Question[] }[] = [
     {
         id: 1,
         name: "Level 1",
         questions: [
             {
                 id: 1,
-                type: "mcq",
-                q: "What is the output of: console.log(typeof NaN)?",
-                options: ["Number", "String", "NaN", "Undefined"],
-                a: "Number",
-                easyClue: "It's a primitive type.",
-                hardClue: "NaN stands for Not-a-Number, but its type is..."
+                type: "text",
+                q: "What is the next term in this sequence: 1, 11, 21, 1211, 111221, ?",
+                p: "Term...",
+                a: "312211",
+                easyClue: "Read the digits aloud.",
+                hardClue: ""
             },
             {
                 id: 2,
                 type: "text",
-                q: "I have cities, but no houses. I have mountains, but no trees. I have water, but no fish. What am I?",
-                p: "Riddle...",
-                a: "Map",
-                easyClue: "You use it for navigation.",
-                hardClue: "Google has a popular app for this."
+                q: "What is the purple below?",
+                p: "Answer...",
+                a: "Colour",
+                easyClue: "Ignore the meaning of the word.",
+                hardClue: "",
+                image: "/extracted_images-000.png"
             },
             {
                 id: 3,
-                type: "mcq",
-                q: "What is 2 + 2 in base 4?",
-                options: ["4", "10", "11", "22"],
-                a: "10",
-                easyClue: "Base 4 only has digits 0, 1, 2, 3.",
-                hardClue: "4 in decimal is 10 in base 4."
+                type: "text",
+                q: "At 3:20, what is the angle between the hour and minute hands? (Answer in degrees, e.g., 20)",
+                p: "Degrees...",
+                a: "20",
+                easyClue: "Calculate angle for both hands keeping in mind the fact that both hands are moving continuously.",
+                hardClue: ""
             },
             {
                 id: 4,
                 type: "text",
-                q: "The more you take, the more you leave behind. What am I?",
-                p: "Riddle...",
-                a: "Footsteps",
-                easyClue: "Think about walking on sand.",
-                hardClue: "They mark where you have been."
+                q: "You have 5 lines and 10 balls and are asked to arrange them in such a way that each line has only 4 balls and not more or less. What is the name of the design?",
+                p: "Design...",
+                a: "Star Formation",
+                easyClue: "If every requirement seems impossible, some things must be shared.",
+                hardClue: ""
             },
             {
                 id: 5,
-                type: "mcq",
-                q: "What protocol is used for secure web browsing?",
-                options: ["HTTP", "FTP", "HTTPS", "SMTP"],
-                a: "HTTPS",
-                easyClue: "It has an 'S' for Secure.",
-                hardClue: "Port 443."
+                type: "text",
+                q: "Cross out 10 digits from the number 1234512345123451234512345 so that the remaining no. is as large as possible.",
+                p: "Number...",
+                a: "55341234512345",
+                easyClue: "We want as many 5's left as possible.",
+                hardClue: ""
             },
         ]
     },
@@ -64,49 +81,49 @@ const levels = [
         name: "Level 2",
         questions: [
             {
-                id: 1,
+                id: 6,
                 type: "text",
-                q: "Which data structure follows LIFO?",
-                p: "Type...",
-                a: "Stack",
-                easyClue: "Like a stack of plates.",
-                hardClue: "Last In, First Out."
+                q: "On an island, every person either always tells truth or always lies. You meet two people, A and B. A says: \"At least one of us is a liar.\" B says: \"A is a liar.\" Who is who?",
+                p: "Answer...",
+                a: "A is truth-teller, B is liar",
+                easyClue: "Test both possibilities for A.",
+                hardClue: ""
             },
             {
-                id: 2,
+                id: 7,
                 type: "text",
-                q: "What comes once in a minute, twice in a moment, but never in a thousand years?",
-                p: "Riddle...",
-                a: "M",
-                easyClue: "Look at the spelling of the words.",
-                hardClue: "It's a letter."
+                q: "3x4=8\n4x5=50\n5x6=30\n6x7=49\n7x8=?",
+                p: "Number...",
+                a: "228",
+                easyClue: "Find gcd of product and 6.",
+                hardClue: ""
             },
             {
-                id: 3,
+                id: 8,
                 type: "text",
-                q: "What converts high-level code to machine code all at once?",
-                p: "Tool...",
-                a: "Compiler",
-                easyClue: "Not an interpreter.",
-                hardClue: "Produces an executable file."
+                q: "(72, 99) -> 27\n(27, 45) -> 18\n(18, 39) -> 21\n(21, 36) -> ?\n(?, 28) -> 13\n(13, 21) -> 7. Find the missing no. based on the above pattern.",
+                p: "Number...",
+                a: "12",
+                easyClue: "Think about fundamental mathematical operations and that each element will independently follow that pattern.",
+                hardClue: ""
             },
             {
-                id: 4,
+                id: 9,
                 type: "text",
-                q: "Who is the 'father of the computer'?",
-                p: "Name...",
-                a: "Babbage",
-                easyClue: "First name Charles.",
-                hardClue: "Designed the Analytical Engine."
+                q: "3 humans and 3 demons need to cross a river. There is only a single boat which can carry a maximum of 2 heads and the boat can't row without any head. Now what is the minimum number of boat rowing required to cross the river, provided if at any side, no. of demons are greater than that of no. of humans, demons will eat them and you lose.",
+                p: "Number...",
+                a: "11",
+                easyClue: "Humans should never be left outnumbered.",
+                hardClue: ""
             },
             {
-                id: 5,
+                id: 10,
                 type: "text",
-                q: "I speak without a mouth and hear without ears. What am I?",
-                p: "Riddle...",
-                a: "Echo",
-                easyClue: "Sound bouncing back.",
-                hardClue: "Mythological nymph who loved Narcissus."
+                q: "Julius came to know that Brutus is going to assasinate him. But the doors to the Roman town hall has been locked and he has to decode this to escape – BQDOQBFDAZ. What is the real password?",
+                p: "Password...",
+                a: "Perceptron",
+                easyClue: "Caesar cipher with shift > 10.",
+                hardClue: ""
             },
         ]
     },
@@ -115,49 +132,49 @@ const levels = [
         name: "Level 3",
         questions: [
             {
-                id: 1,
+                id: 11,
                 type: "text",
-                q: "What key is used to refresh a page?",
-                p: "Key...",
-                a: "F5",
-                easyClue: "Function key.",
-                hardClue: "Between F4 and F6."
+                q: "A computer program searches for a secret number stored in memory. The number lies between 1 and 100, inclusive. The program follows a method where each comparison can only tell whether the guessed number is too high, too low, or correct. The programmer wants to guarantee that the correct number is found in the worst case, no matter what the number is. What is the minimum number of comparisons required to guarantee finding the number?",
+                p: "Number...",
+                a: "7",
+                easyClue: "Each comparison reduces the range of possible values.",
+                hardClue: ""
             },
             {
-                id: 2,
+                id: 12,
                 type: "text",
-                q: "What do you call a function that calls itself?",
-                p: "Concept...",
-                a: "Recursive",
-                easyClue: "Like looking in two mirrors facing each other.",
-                hardClue: "Base case is required to stop it."
+                q: "What is the minimum no. of weights which enable us to weigh any integer number of grams of gold from 1 to 100 on a standard balance with two pans? Weights may be placed only on the left pan.",
+                p: "Number...",
+                a: "63", // Keeping strictly to PDF solution, though technically it's usually 7 weights (1,2,4...64). PDF says 63.
+                easyClue: "Think about the binary representation of integers.",
+                hardClue: ""
             },
             {
-                id: 3,
+                id: 13,
                 type: "text",
-                q: "Binary representation of 5?",
-                p: "Bits...",
-                a: "101",
-                easyClue: "4 + 0 + 1",
-                hardClue: "Odd number ends in 1."
+                q: "Uvi and Arush sat in front of each other at a round table to play a game with coins. The rule of the game is very simple that both will place the coins simultaneously on the table, no one can place consecutive coins in a round. Also no coin can overlap other coins and the game ends if one can't place any more coin in the table. Who has the highest chance of winning the game if Uvi starts?",
+                p: "Name...",
+                a: "Uvi",
+                easyClue: "The second player should not try to be creative - only consistent.",
+                hardClue: ""
             },
             {
-                id: 4,
+                id: 14,
                 type: "text",
-                q: "What is the main circuit board in a computer?",
-                p: "Hardware...",
-                a: "Motherboard",
-                easyClue: "The 'parent' board.",
-                hardClue: "Holds the CPU and RAM."
+                q: "If you have a number of non uniform inflammable wire, which burns out in an hour, what would be the minimum no. of wires required to measure a time of about 75 mins. Point to note that non uniform inflammable means that if a wire burns out in an hour, it is not necessary that 50% of the wire is burnt out in half an hour, or quarter of the wire burns out in 15 mins.",
+                p: "Number...",
+                a: "3 wires",
+                easyClue: "You can control how long a wire lasts only by choosing how many ends you light.",
+                hardClue: ""
             },
             {
-                id: 5,
+                id: 15,
                 type: "text",
-                q: "I have keys but no locks. I have a space but no room. You can enter, but can't go outside. What am I?",
-                p: "Device...",
-                a: "Keyboard",
-                easyClue: "You are using one right now.",
-                hardClue: "QWERTY is a common layout."
+                q: "Vishal and Reddy met each other after a long time. When Reddy was asked by Vishal how he was doing after his marriage, Reddy answered that he is the father of his 3 siblings. When asked about their age, he answered that the product of their age is 72, and the sum of ages is the birth date of Vishal. When he asked for any more information, he answered that one of his sons is playing piano. What is the age of his youngest child?",
+                p: "Number...",
+                a: "3",
+                easyClue: "The piano detail is not about music. It's about being able to point to one specific child.",
+                hardClue: ""
             },
         ]
     },
@@ -166,49 +183,49 @@ const levels = [
         name: "Level 4",
         questions: [
             {
-                id: 1,
+                id: 16,
                 type: "text",
-                q: "Protocol for sending emails?",
-                p: "Acronym...",
-                a: "SMTP",
-                easyClue: "Simple Mail...",
-                hardClue: "Transfer Protocol."
-            },
-            {
-                id: 2,
-                type: "text",
-                q: "What acts as a bridge between the OS and hardware?",
-                p: "Concept...",
-                a: "Kernel",
-                easyClue: "Popcorn center?",
-                hardClue: "Core component of an OS."
-            },
-            {
-                id: 3,
-                type: "text",
-                q: "In OOP, what concept hides implementation details?",
-                p: "Concept...",
-                a: "Encapsulation",
-                easyClue: "Putting things in a capsule.",
-                hardClue: "Data hiding."
-            },
-            {
-                id: 4,
-                type: "text",
-                q: "Default HTTP port?",
+                q: "A house has 3 bulbs in 3 rooms whose switches are placed at the basement of the house. The switches are unmarked, i.e. one can't tell which switch lights which bulb. You decide to mark the switches for your convenience. But if you light a bulb, you can't tell which bulb lights. How many times you need to leave the basement in order to mark which switch is of which bulb, provided you can switch on any number of bulbs at a time.",
                 p: "Number...",
-                a: "80",
-                easyClue: "Not 443.",
-                hardClue: "A standard web port."
+                a: "1",
+                easyClue: "Light is not the only thing a bulb can remember.",
+                hardClue: "Use time. Leave one switch on long enough, then change the others before going upstairs."
             },
             {
-                id: 5,
+                id: 17,
                 type: "text",
-                q: "Language of the web?",
-                p: "Language...",
-                a: "HTML",
-                easyClue: "Hyper Text...",
-                hardClue: "Markup Language."
+                q: "There is a 100-story building from which I have to drop two eggs and do an experiment. And the test is that if I am standing on floor N, if I drop an egg from there, the egg will break, but if I drop an egg from floor N-1, the egg will not break. So how many minimum tests do I need to take to find this Nth floor?",
+                p: "Number...",
+                a: "14",
+                easyClue: "Your first egg decides the size of your steps. Your second egg decides the exact place.",
+                hardClue: "Don't test every floor equally. Reduce your jump size each time so that the worst case stays balanced."
+            },
+            {
+                id: 18,
+                type: "text",
+                q: "You have a table of 100 coins, where 80 coins are faced heads up and 20 coins are faced tails up. You can't tell about the upper face of the coin by just looking or touching the coin. You need to distribute the coins in 2 sets such that each set has the same number of tails faced upwards. What would be the minimum number of coins in a set to make that happen.",
+                p: "Number...",
+                a: "20",
+                easyClue: "You don't need to know which coins are tails to control how many tails you get.",
+                hardClue: "Assume a fixed number of coins for the first set and let the second set be everything else."
+            },
+            {
+                id: 19,
+                type: "text",
+                q: "In a certain year there were exactly four Fridays and exactly four Mondays in a January. On what day of the week did the 20th of January fall that year?",
+                p: "Day...",
+                a: "Sunday",
+                easyClue: "Think if Jan 1 was a certain day of the week, when would that day of the week repeat.",
+                hardClue: "Try to see that what days of Jan 1 would result in January having 5 Mondays and 5 Fridays."
+            },
+            {
+                id: 20,
+                type: "text",
+                q: "Out of 2000 packets of food for an Annual NYPD Event, 1 packet is poisoned by a serial killer to kill an agent to create chaos. The man in the suit, John Reese, gets this information that the event will occur after 10 hours and the poison is slow, so the death will occur after 5 hrs during the party, through Finch’s machine. He reaches the place with Detective Fuesco to stop that. But Fuesco reminded him that to determine the poisoned food through forensic will take about 12 to 13 hours within which the poison will begin its effect. So Reese asked the manager to bring a number of Guinea pigs to determine the poisoned food. What would be the minimum number of Guinea pigs required to determine the poisoned food?",
+                p: "Number...",
+                a: "11",
+                easyClue: "Not every detail is meant to be used. Decide first what information actually matters.",
+                hardClue: "Each guinea pig can answer only one yes-or-no question."
             },
         ]
     },
@@ -217,49 +234,54 @@ const levels = [
         name: "Level 5",
         questions: [
             {
-                id: 1,
+                id: 21,
                 type: "text",
-                q: "What does 'CPU' stand for (first word)?",
-                p: "Word...",
-                a: "Central",
-                easyClue: "Middle.",
-                hardClue: "C in CPU."
+                q: "A game pays you $1 the first time you win, $2 the second time, $4 the third time and so on, doubling each win. The probability of winning each round is 1/2 . What is the expected total payout (calculate on average if MANY games are played, write the answer in words for eg.: Zero, One point Five, Infinity etc.)?",
+                p: "Answer...",
+                a: "Infinity",
+                easyClue: (
+                    <div className="flex flex-col items-center">
+                        <p>Compute the expectation <span className="inline-block bg-white px-2 rounded text-black"><InlineMath math="\sum x p(x)" /></span> over N games as N {'->'} infinity.</p>
+                    </div>
+                ),
+                hardClue: "The expectation diverges."
             },
             {
-                id: 2,
+                id: 22,
                 type: "text",
-                q: "Smallest unit of data in a computer?",
-                p: "Unit...",
-                a: "Bit",
-                easyClue: "0 or 1.",
-                hardClue: "1/8th of a byte."
+                q: "Three friends need to reach Kolkata from Purulia, which is about 300km away in such a way, that they reach Kolkata at the same time. They only have a bike where tripling is not allowed and can carry a maximum of 2 people. Now, the bike moves at a constant speed of 30kmph while they all walk at a constant speed of 10 kmph. What time would they reach Kolkata if they start their journey from Purulia at around 8am? (Write answer as in a 24-hr digital clock format, eg, 13:30, 07:50 etc)",
+                p: "Time...",
+                a: "12:40",
+                easyClue: "If you assume the bike always moves forward, you've already made a mistake.",
+                hardClue: "To keep all three together, the bike must sometimes travel in the opposite direction."
             },
             {
-                id: 3,
+                id: 23,
                 type: "text",
-                q: "What is the opposite of 'upload'?",
-                p: "Action...",
-                a: "Download",
-                easyClue: "Down...",
-                hardClue: "Getting files from the internet."
+                q: "You have 25 horses and a race track and you want to find the top 3 fast horses among them. What minimum of race is required for finding that given that at a time only 5 horses can participate in the track and you are not provided with any race instrument except a pistol for starting and ribbon at the finish line. Provided all horses run at the same speed for all races.",
+                p: "Number...",
+                a: "7",
+                easyClue: "Don't try to find the fastest horse directly. First, eliminate the slowest ones in batches.",
+                hardClue: "Race the horses in fixed groups and remember the order within each group."
             },
             {
-                id: 4,
+                id: 24,
                 type: "text",
-                q: "Name of the first electronic general-purpose computer?",
-                p: "Acronym...",
-                a: "ENIAC",
-                easyClue: "Starts with E.",
-                hardClue: "Built at UPenn."
+                q: "A circle has 3 points chosen uniformly at random on its circumference. What is the probability that the triangle formed contains the center of the circle? (Write answer in words, eg,: if answer is 0.5 write zero point five, if answer is 2.33 write two point three three etc.)",
+                p: "Probability...",
+                a: "Zero point two five",
+                easyClue: "Think arcs.",
+                hardClue: "No arc >= 180 degrees."
             },
             {
-                id: 5,
+                id: 25,
                 type: "text",
-                q: "Volatile memory is known as?",
-                p: "Acronym...",
-                a: "RAM",
-                easyClue: "Random Access...",
-                hardClue: "Loses data when power is off."
+                q: "You have 50 people lined up in a room as given in the image. Each person is either a truth-teller, who always tells the truth, or a liar, who always lies. Each person knows the type of everyone else. The following image shows the statements of each person. Which of the person (s) is/are lying?",
+                p: "Number...",
+                a: "2",
+                easyClue: "Is person 50 a liar? If yes, what does that tell us about person 49?",
+                hardClue: "From the first clue can we find out if 47 is a liar?",
+                image: "/extracted_images-002.png"
             },
         ]
     }
@@ -314,7 +336,7 @@ const ChipIcon = (props: React.SVGProps<SVGSVGElement>) => (
 
 
 export default function QuestionsPage() {
-    const { useToken, addReward, resetLevelTokens, disqualifyUser, isDisqualified } = useGame(); // Use Global State
+    const { useToken, addReward, resetLevelTokens, disqualifyUser, isDisqualified, userName } = useGame(); // Use Global State
     const router = useRouter(); // Use Router
     const [currentLevelIndex, setCurrentLevelIndex] = useState(0);
     const [passwordInput, setPasswordInput] = useState("");
@@ -333,7 +355,7 @@ export default function QuestionsPage() {
     const [showLockdown, setShowLockdown] = useState(false);
     const [activeTokenQuestion, setActiveTokenQuestion] = useState<number | null>(null);
     const [usedClues, setUsedClues] = useState<Record<number, ('easy' | 'hard' | 'skip')[]>>({});
-    const [clueMessage, setClueMessage] = useState<string | null>(null);
+    const [clueMessage, setClueMessage] = useState<React.ReactNode | null>(null);
     const [timeLeft, setTimeLeft] = useState(5400); // 90 minutes
 
     const currentLevel = levels[currentLevelIndex];
@@ -404,15 +426,55 @@ export default function QuestionsPage() {
 
         if (cleanString(passwordInput) === levelPassword) {
             setShowSuccess(true);
-            addReward(500); // Reward for clearing level
-            await new Promise(r => setTimeout(r, 3000)); // Show success animation for 3s
+
+            await new Promise(r => setTimeout(r, 1500)); // Show success animation for 1.5s
             setShowSuccess(false);
 
             if (currentLevelIndex < levels.length - 1) {
+                // Calculate rewards: 80 points per manually solved question
+                // Exclude questions where 'skip' token was used
+                let skippedCount = 0;
+                currentLevel.questions.forEach(q => {
+                    if (usedClues[q.id]?.includes('skip')) {
+                        skippedCount++;
+                    }
+                });
+
+                const manualSolvedCount = currentLevel.questions.length - skippedCount;
+                const reward = manualSolvedCount * 80;
+
+                if (reward > 0) {
+                    addReward(reward);
+                }
+
                 setCurrentLevelIndex(prev => prev + 1);
             } else {
+                // 🔴 FINAL LEVEL COMPLETED — CALL BACKEND HERE 🔴
+
+                // try {
+                //     const contestantId = localStorage.getItem("contestantId");
+
+                //     if (contestantId) {
+                //         await fetch("http://localhost:8000/api/finish/", {
+                //             method: "POST",
+                //             headers: {
+                //                 "Content-Type": "application/json",
+                //             },
+                //             body: JSON.stringify({
+                //                 id: contestantId,
+                //             }),
+                //         });
+
+                //         // optional: prevent re-submission
+                //         localStorage.removeItem("contestantId");
+                //     }
+                // } catch (err) {
+                //     console.error("Finish API failed", err);
+                // }
+
                 setIsGameComplete(true);
             }
+
         } else {
             setShake(true);
             setShowError(true);
@@ -441,12 +503,15 @@ export default function QuestionsPage() {
         if (activeTokenQuestion === null) return;
 
         // Check if already used
+        // Check if already used or if skip has been used
         if (usedClues[activeTokenQuestion]?.includes(type)) return;
+        if (usedClues[activeTokenQuestion]?.includes('skip')) return; // If skip used, nothing else allowed
+        if (type !== 'skip' && usedClues[activeTokenQuestion]?.includes('skip')) return; // Redundant but safe
 
         let cost = 0;
         if (type === 'easy') cost = 50;
         if (type === 'hard') cost = 100;
-        if (type === 'skip') cost = 200;
+        if (type === 'skip') cost = 250;
 
         const success = useToken(type, cost);
 
@@ -455,10 +520,19 @@ export default function QuestionsPage() {
             if (!question) return;
 
             if (type === 'easy') {
-                setClueMessage(`EASY CLUE: ${question.easyClue}`);
+                setClueMessage(<div className="flex flex-col items-center gap-2"><span className="font-bold text-blue-400">EASY CLUE:</span> <div>{question.easyClue}</div></div>);
             } else if (type === 'hard') {
-                setClueMessage(`HARD CLUE: ${question.hardClue}`);
+                setClueMessage(<div className="flex flex-col items-center gap-2"><span className="font-bold text-red-400">HARD CLUE:</span> <div>{question.hardClue}</div></div>);
             } else if (type === 'skip') {
+                if (!usedClues[activeTokenQuestion]?.includes('skip')) {
+                    // Ensure no other tokens are used, or just override?
+                    // User rule: "if user uses skip token then any other token can't be use for that question"
+                    // This implies Skip is exclusive.
+                    // But if they ALREADY used easy/hard, can they use skip? Usually yes, skip is the bailout.
+                    // The rule probably means "Once Skip is used, disable others".
+                    // AND "If Skip is used, you can't use others". 
+                    // So we just track it. The Modal/UI should disable buttons if 'skip' is present in usedClues.
+                }
                 handleInputChange(activeTokenQuestion, question.a);
                 setClueMessage("QUESTION BYPASSED. ANSWER INJECTED.");
             }
@@ -512,7 +586,7 @@ export default function QuestionsPage() {
                 <div className="fixed inset-0 z-[250] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in">
                     <div className="bg-zinc-900 border border-blue-500/50 p-8 rounded-xl max-w-lg w-full text-center shadow-[0_0_30px_rgba(59,130,246,0.5)]">
                         <h3 className="text-2xl font-bold text-blue-400 mb-4 font-mono">INTELLIGENCE RECEIVED</h3>
-                        <p className="text-white text-lg font-mono mb-8">{clueMessage}</p>
+                        <div className="text-white text-lg font-mono mb-8">{clueMessage}</div>
                         <button
                             onClick={() => setClueMessage(null)}
                             className="bg-blue-600 hover:bg-blue-500 text-white px-8 py-3 rounded font-bold tracking-wider"
@@ -620,6 +694,9 @@ export default function QuestionsPage() {
                             <h1 className="text-4xl md:text-7xl font-black mb-3 tracking-tighter text-white drop-shadow-2xl">
                                 THE GAUNTLET
                             </h1>
+                            <div className="text-red-500 font-mono text-xl tracking-[0.3em] mb-4 animate-pulse">
+                                USER:{userName || 'UNKNOWN'}
+                            </div>
                             <p className="text-zinc-400 text-sm md:text-xl max-w-2xl mx-auto leading-relaxed">
                                 Solve the riddles. <span className="text-red-500 font-bold">First letter = Password.</span>
                             </p>
@@ -635,7 +712,7 @@ export default function QuestionsPage() {
                                             </div>
                                             <div className="flex-grow space-y-4 w-full">
                                                 <div className="flex justify-between items-start">
-                                                    <label htmlFor={`q-${q.id}`} className="block text-lg md:text-2xl font-bold text-gray-100 tracking-tight whitespace-pre-wrap font-mono">
+                                                    <label htmlFor={`q-${q.id}`} className="block text-sm md:text-xl font-bold text-gray-100 tracking-tight whitespace-pre-wrap font-mono">
                                                         {q.q}
                                                     </label>
 
@@ -648,6 +725,16 @@ export default function QuestionsPage() {
                                                         USE TOKEN
                                                     </button>
                                                 </div>
+
+                                                {/* VISUAL COMPONENT (e.g. Q2) */}
+                                                {q.visualComponent}
+
+                                                {/* IMAGE (e.g. Q25) */}
+                                                {q.image && (
+                                                    <div className="w-full max-w-lg mx-auto my-6 border border-zinc-700 rounded-lg overflow-hidden">
+                                                        <img src={q.image} alt="Puzzle Image" className="w-full h-auto" />
+                                                    </div>
+                                                )}
 
                                                 <div className="relative group/input">
                                                     {q.type === 'mcq' && q.options ? (
