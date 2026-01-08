@@ -7,285 +7,10 @@ import TokenModal from "@/components/TokenModal"; // Import Token Modal
 import TokenStatus from "@/components/TokenStatus"; // Import TokenStatus
 import "katex/dist/katex.min.css";
 import { InlineMath } from "react-katex";
+import ResultPage from "../result/page";
 
-// --- Game Configurations ---
-// --- Game Configurations ---
-interface Question {
-    id: number;
-    type: string;
-    q: string;
-    p: string;
-    a: string;
-    easyClue: string | React.ReactNode;
-    hardClue: string;
-    visualComponent?: React.ReactNode;
-    image?: string;
-    options?: string[];
-}
+import { levels } from "../data/levels";
 
-const levels: { id: number; name: string; questions: Question[] }[] = [
-    {
-        id: 1,
-        name: "Level 1",
-        questions: [
-            {
-                id: 1,
-                type: "text",
-                q: "What is the next term in this sequence: 1, 11, 21, 1211, 111221, ?",
-                p: "Term...",
-                a: "312211",
-                easyClue: "Read the digits aloud.",
-                hardClue: ""
-            },
-            {
-                id: 2,
-                type: "text",
-                q: "What is the purple below?",
-                p: "Answer...",
-                a: "Colour",
-                easyClue: "Ignore the meaning of the word.",
-                hardClue: "",
-                image: "/extracted_images-000.png"
-            },
-            {
-                id: 3,
-                type: "text",
-                q: "At 3:20, what is the angle between the hour and minute hands? (Answer in degrees, e.g., 20)",
-                p: "Degrees...",
-                a: "20",
-                easyClue: "Calculate angle for both hands keeping in mind the fact that both hands are moving continuously.",
-                hardClue: ""
-            },
-            {
-                id: 4,
-                type: "text",
-                q: "You have 5 lines and 10 balls and are asked to arrange them in such a way that each line has only 4 balls and not more or less. What is the name of the design?",
-                p: "Design...",
-                a: "Star Formation",
-                easyClue: "If every requirement seems impossible, some things must be shared.",
-                hardClue: ""
-            },
-            {
-                id: 5,
-                type: "text",
-                q: "Cross out 10 digits from the number 1234512345123451234512345 so that the remaining no. is as large as possible.",
-                p: "Number...",
-                a: "55341234512345",
-                easyClue: "We want as many 5's left as possible.",
-                hardClue: ""
-            },
-        ]
-    },
-    {
-        id: 2,
-        name: "Level 2",
-        questions: [
-            {
-                id: 6,
-                type: "text",
-                q: "On an island, every person either always tells truth or always lies. You meet two people, A and B. A says: \"At least one of us is a liar.\" B says: \"A is a liar.\" Who is who?",
-                p: "Answer...",
-                a: "A is truth-teller, B is liar",
-                easyClue: "Test both possibilities for A.",
-                hardClue: ""
-            },
-            {
-                id: 7,
-                type: "text",
-                q: "3x4=8\n4x5=50\n5x6=30\n6x7=49\n7x8=?",
-                p: "Number...",
-                a: "228",
-                easyClue: "Find gcd of product and 6.",
-                hardClue: ""
-            },
-            {
-                id: 8,
-                type: "text",
-                q: "(72, 99) -> 27\n(27, 45) -> 18\n(18, 39) -> 21\n(21, 36) -> ?\n(?, 28) -> 13\n(13, 21) -> 7. Find the missing no. based on the above pattern.",
-                p: "Number...",
-                a: "12",
-                easyClue: "Think about fundamental mathematical operations and that each element will independently follow that pattern.",
-                hardClue: ""
-            },
-            {
-                id: 9,
-                type: "text",
-                q: "3 humans and 3 demons need to cross a river. There is only a single boat which can carry a maximum of 2 heads and the boat can't row without any head. Now what is the minimum number of boat rowing required to cross the river, provided if at any side, no. of demons are greater than that of no. of humans, demons will eat them and you lose.",
-                p: "Number...",
-                a: "11",
-                easyClue: "Humans should never be left outnumbered.",
-                hardClue: ""
-            },
-            {
-                id: 10,
-                type: "text",
-                q: "Julius came to know that Brutus is going to assasinate him. But the doors to the Roman town hall has been locked and he has to decode this to escape – BQDOQBFDAZ. What is the real password?",
-                p: "Password...",
-                a: "Perceptron",
-                easyClue: "Caesar cipher with shift > 10.",
-                hardClue: ""
-            },
-        ]
-    },
-    {
-        id: 3,
-        name: "Level 3",
-        questions: [
-            {
-                id: 11,
-                type: "text",
-                q: "A computer program searches for a secret number stored in memory. The number lies between 1 and 100, inclusive. The program follows a method where each comparison can only tell whether the guessed number is too high, too low, or correct. The programmer wants to guarantee that the correct number is found in the worst case, no matter what the number is. What is the minimum number of comparisons required to guarantee finding the number?",
-                p: "Number...",
-                a: "7",
-                easyClue: "Each comparison reduces the range of possible values.",
-                hardClue: ""
-            },
-            {
-                id: 12,
-                type: "text",
-                q: "What is the minimum no. of weights which enable us to weigh any integer number of grams of gold from 1 to 100 on a standard balance with two pans? Weights may be placed only on the left pan.",
-                p: "Number...",
-                a: "63", // Keeping strictly to PDF solution, though technically it's usually 7 weights (1,2,4...64). PDF says 63.
-                easyClue: "Think about the binary representation of integers.",
-                hardClue: ""
-            },
-            {
-                id: 13,
-                type: "text",
-                q: "Uvi and Arush sat in front of each other at a round table to play a game with coins. The rule of the game is very simple that both will place the coins simultaneously on the table, no one can place consecutive coins in a round. Also no coin can overlap other coins and the game ends if one can't place any more coin in the table. Who has the highest chance of winning the game if Uvi starts?",
-                p: "Name...",
-                a: "Uvi",
-                easyClue: "The second player should not try to be creative - only consistent.",
-                hardClue: ""
-            },
-            {
-                id: 14,
-                type: "text",
-                q: "If you have a number of non uniform inflammable wire, which burns out in an hour, what would be the minimum no. of wires required to measure a time of about 75 mins. Point to note that non uniform inflammable means that if a wire burns out in an hour, it is not necessary that 50% of the wire is burnt out in half an hour, or quarter of the wire burns out in 15 mins.",
-                p: "Number...",
-                a: "3 wires",
-                easyClue: "You can control how long a wire lasts only by choosing how many ends you light.",
-                hardClue: ""
-            },
-            {
-                id: 15,
-                type: "text",
-                q: "Vishal and Reddy met each other after a long time. When Reddy was asked by Vishal how he was doing after his marriage, Reddy answered that he is the father of his 3 siblings. When asked about their age, he answered that the product of their age is 72, and the sum of ages is the birth date of Vishal. When he asked for any more information, he answered that one of his sons is playing piano. What is the age of his youngest child?",
-                p: "Number...",
-                a: "3",
-                easyClue: "The piano detail is not about music. It's about being able to point to one specific child.",
-                hardClue: ""
-            },
-        ]
-    },
-    {
-        id: 4,
-        name: "Level 4",
-        questions: [
-            {
-                id: 16,
-                type: "text",
-                q: "A house has 3 bulbs in 3 rooms whose switches are placed at the basement of the house. The switches are unmarked, i.e. one can't tell which switch lights which bulb. You decide to mark the switches for your convenience. But if you light a bulb, you can't tell which bulb lights. How many times you need to leave the basement in order to mark which switch is of which bulb, provided you can switch on any number of bulbs at a time.",
-                p: "Number...",
-                a: "1",
-                easyClue: "Light is not the only thing a bulb can remember.",
-                hardClue: "Use time. Leave one switch on long enough, then change the others before going upstairs."
-            },
-            {
-                id: 17,
-                type: "text",
-                q: "There is a 100-story building from which I have to drop two eggs and do an experiment. And the test is that if I am standing on floor N, if I drop an egg from there, the egg will break, but if I drop an egg from floor N-1, the egg will not break. So how many minimum tests do I need to take to find this Nth floor?",
-                p: "Number...",
-                a: "14",
-                easyClue: "Your first egg decides the size of your steps. Your second egg decides the exact place.",
-                hardClue: "Don't test every floor equally. Reduce your jump size each time so that the worst case stays balanced."
-            },
-            {
-                id: 18,
-                type: "text",
-                q: "You have a table of 100 coins, where 80 coins are faced heads up and 20 coins are faced tails up. You can't tell about the upper face of the coin by just looking or touching the coin. You need to distribute the coins in 2 sets such that each set has the same number of tails faced upwards. What would be the minimum number of coins in a set to make that happen.",
-                p: "Number...",
-                a: "20",
-                easyClue: "You don't need to know which coins are tails to control how many tails you get.",
-                hardClue: "Assume a fixed number of coins for the first set and let the second set be everything else."
-            },
-            {
-                id: 19,
-                type: "text",
-                q: "In a certain year there were exactly four Fridays and exactly four Mondays in a January. On what day of the week did the 20th of January fall that year?",
-                p: "Day...",
-                a: "Sunday",
-                easyClue: "Think if Jan 1 was a certain day of the week, when would that day of the week repeat.",
-                hardClue: "Try to see that what days of Jan 1 would result in January having 5 Mondays and 5 Fridays."
-            },
-            {
-                id: 20,
-                type: "text",
-                q: "Out of 2000 packets of food for an Annual NYPD Event, 1 packet is poisoned by a serial killer to kill an agent to create chaos. The man in the suit, John Reese, gets this information that the event will occur after 10 hours and the poison is slow, so the death will occur after 5 hrs during the party, through Finch’s machine. He reaches the place with Detective Fuesco to stop that. But Fuesco reminded him that to determine the poisoned food through forensic will take about 12 to 13 hours within which the poison will begin its effect. So Reese asked the manager to bring a number of Guinea pigs to determine the poisoned food. What would be the minimum number of Guinea pigs required to determine the poisoned food?",
-                p: "Number...",
-                a: "11",
-                easyClue: "Not every detail is meant to be used. Decide first what information actually matters.",
-                hardClue: "Each guinea pig can answer only one yes-or-no question."
-            },
-        ]
-    },
-    {
-        id: 5,
-        name: "Level 5",
-        questions: [
-            {
-                id: 21,
-                type: "text",
-                q: "A game pays you $1 the first time you win, $2 the second time, $4 the third time and so on, doubling each win. The probability of winning each round is 1/2 . What is the expected total payout (calculate on average if MANY games are played, write the answer in words for eg.: Zero, One point Five, Infinity etc.)?",
-                p: "Answer...",
-                a: "Infinity",
-                easyClue: (
-                    <div className="flex flex-col items-center">
-                        <p>Compute the expectation <span className="inline-block bg-white px-2 rounded text-black"><InlineMath math="\sum x p(x)" /></span> over N games as N {'->'} infinity.</p>
-                    </div>
-                ),
-                hardClue: "The expectation diverges."
-            },
-            {
-                id: 22,
-                type: "text",
-                q: "Three friends need to reach Kolkata from Purulia, which is about 300km away in such a way, that they reach Kolkata at the same time. They only have a bike where tripling is not allowed and can carry a maximum of 2 people. Now, the bike moves at a constant speed of 30kmph while they all walk at a constant speed of 10 kmph. What time would they reach Kolkata if they start their journey from Purulia at around 8am? (Write answer as in a 24-hr digital clock format, eg, 13:30, 07:50 etc)",
-                p: "Time...",
-                a: "12:40",
-                easyClue: "If you assume the bike always moves forward, you've already made a mistake.",
-                hardClue: "To keep all three together, the bike must sometimes travel in the opposite direction."
-            },
-            {
-                id: 23,
-                type: "text",
-                q: "You have 25 horses and a race track and you want to find the top 3 fast horses among them. What minimum of race is required for finding that given that at a time only 5 horses can participate in the track and you are not provided with any race instrument except a pistol for starting and ribbon at the finish line. Provided all horses run at the same speed for all races.",
-                p: "Number...",
-                a: "7",
-                easyClue: "Don't try to find the fastest horse directly. First, eliminate the slowest ones in batches.",
-                hardClue: "Race the horses in fixed groups and remember the order within each group."
-            },
-            {
-                id: 24,
-                type: "text",
-                q: "A circle has 3 points chosen uniformly at random on its circumference. What is the probability that the triangle formed contains the center of the circle? (Write answer in words, eg,: if answer is 0.5 write zero point five, if answer is 2.33 write two point three three etc.)",
-                p: "Probability...",
-                a: "Zero point two five",
-                easyClue: "Think arcs.",
-                hardClue: "No arc >= 180 degrees."
-            },
-            {
-                id: 25,
-                type: "text",
-                q: "You have 50 people lined up in a room as given in the image. Each person is either a truth-teller, who always tells the truth, or a liar, who always lies. Each person knows the type of everyone else. The following image shows the statements of each person. Which of the person (s) is/are lying?",
-                p: "Number...",
-                a: "2",
-                easyClue: "Is person 50 a liar? If yes, what does that tell us about person 49?",
-                hardClue: "From the first clue can we find out if 47 is a liar?",
-                image: "/extracted_images-002.png"
-            },
-        ]
-    }
-];
 
 // --- Icons ---
 const BrainIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -336,7 +61,18 @@ const ChipIcon = (props: React.SVGProps<SVGSVGElement>) => (
 
 
 export default function QuestionsPage() {
-    const { useToken, addReward, resetLevelTokens, disqualifyUser, isDisqualified, userName } = useGame(); // Use Global State
+    const {
+        useToken,
+        addReward,
+        resetLevelTokens,
+        disqualifyUser,
+        isDisqualified,
+        userName,
+        setGameWon,
+        setFinalTime,
+        usedClues,
+        markClueUsed
+    } = useGame(); // Use Global State
     const router = useRouter(); // Use Router
     const [currentLevelIndex, setCurrentLevelIndex] = useState(0);
     const [passwordInput, setPasswordInput] = useState("");
@@ -354,9 +90,10 @@ export default function QuestionsPage() {
     const [guessCount, setGuessCount] = useState(0);
     const [showLockdown, setShowLockdown] = useState(false);
     const [activeTokenQuestion, setActiveTokenQuestion] = useState<number | null>(null);
-    const [usedClues, setUsedClues] = useState<Record<number, ('easy' | 'hard' | 'skip')[]>>({});
+    // const [usedClues, setUsedClues] = useState<Record<number, ('easy' | 'hard' | 'skip')[]>>({}); // MOVED TO CONTEXT
     const [clueMessage, setClueMessage] = useState<React.ReactNode | null>(null);
     const [timeLeft, setTimeLeft] = useState(5400); // 90 minutes
+    const [isFullscreen, setIsFullscreen] = useState(true);
 
     const currentLevel = levels[currentLevelIndex];
 
@@ -364,7 +101,34 @@ export default function QuestionsPage() {
     const levelPassword = currentLevel.questions.map(q => q.a.charAt(0)).join("").toUpperCase();
 
     // --- TAB SWITCH DETECTION (ANTI-CHEAT) ---
+    // --- NAVIGATION & FULLSCREEN LOCKDOWN ---
     useEffect(() => {
+        // Prevent back navigation
+        window.history.pushState(null, "", window.location.href);
+        const handlePopState = () => {
+            window.history.pushState(null, "", window.location.href);
+        };
+        window.addEventListener("popstate", handlePopState);
+
+        // Warn on unload
+        const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+            e.preventDefault();
+            e.returnValue = '';
+        };
+        window.addEventListener("beforeunload", handleBeforeUnload);
+
+        // Check fullscreen
+        const checkFullscreen = () => {
+            if (!document.fullscreenElement) {
+                setIsFullscreen(false);
+            } else {
+                setIsFullscreen(true);
+            }
+        };
+        document.addEventListener("fullscreenchange", checkFullscreen);
+        checkFullscreen(); // Initial check
+
+        // Visibility Change (Anti-Cheat)
         const handleVisibilityChange = () => {
             if (document.hidden) {
                 // User switched tabs or minimized window
@@ -372,10 +136,12 @@ export default function QuestionsPage() {
                 router.push("/result");
             }
         };
-
         document.addEventListener("visibilitychange", handleVisibilityChange);
 
         return () => {
+            window.removeEventListener("popstate", handlePopState);
+            window.removeEventListener("beforeunload", handleBeforeUnload);
+            document.removeEventListener("fullscreenchange", checkFullscreen);
             document.removeEventListener("visibilitychange", handleVisibilityChange);
         };
     }, [disqualifyUser, router]);
@@ -397,7 +163,7 @@ export default function QuestionsPage() {
     useEffect(() => {
         resetLevelTokens(currentLevelIndex); // Reset tokens for the new level
         setAnswers({});
-        setUsedClues({}); // Reset used clues for the new level
+        // usedClues is now global and persistent, so we don't reset it here
         setPasswordInput("");
         setGuessCount(0); // Reset guess count
         if (scrollContainerRef.current) {
@@ -473,6 +239,9 @@ export default function QuestionsPage() {
                 // }
 
                 setIsGameComplete(true);
+                setGameWon(true);
+                setFinalTime(timeLeft);
+                router.push("/result");
             }
 
         } else {
@@ -538,10 +307,7 @@ export default function QuestionsPage() {
             }
 
             // Track used clue
-            setUsedClues(prev => ({
-                ...prev,
-                [activeTokenQuestion]: [...(prev[activeTokenQuestion] || []), type]
-            }));
+            markClueUsed(activeTokenQuestion, type);
         }
 
         setActiveTokenQuestion(null);
@@ -558,10 +324,11 @@ export default function QuestionsPage() {
 
     if (isGameComplete) {
         return (
-            <div className="flex flex-col items-center justify-center min-h-screen bg-black text-white font-mono">
-                <h1 className="text-6xl text-green-500 font-bold mb-4 animate-bounce">SYSTEM HACKED</h1>
-                <p className="mt-8 text-2xl text-white">CONGRATULATIONS, USER.</p>
-            </div>
+            // <div className="flex flex-col items-center justify-center min-h-screen bg-black text-white font-mono">
+            //     <h1 className="text-6xl text-green-500 font-bold mb-4 animate-bounce">SYSTEM HACKED</h1>
+            //     <p className="mt-8 text-2xl text-white">CONGRATULATIONS, USER.</p>
+            // </div>
+            <ResultPage />
         );
     }
 
@@ -611,6 +378,25 @@ export default function QuestionsPage() {
                             className="bg-red-600 hover:bg-red-500 text-black px-10 py-4 text-xl font-bold tracking-[0.2em] animate-pulse rounded-sm"
                         >
                             TERMINATE SESSION
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {/* FULLSCREEN WARNING MODAL */}
+            {!isFullscreen && !isGameComplete && !showLockdown && (
+                <div className="fixed inset-0 z-[400] bg-black/95 flex items-center justify-center backdrop-blur-xl p-4">
+                    <div className="text-center max-w-xl w-full border border-red-500/50 p-8 rounded-lg bg-zinc-900/50">
+                        <h1 className="text-red-500 font-mono font-bold text-3xl mb-4 animate-pulse">SECURITY VIOLATION</h1>
+                        <p className="text-zinc-300 font-mono mb-8">
+                            FULL SCREEN MODE IS MANDATORY.<br />
+                            RETURN TO SECURE VIEW IMMEDIATELY.
+                        </p>
+                        <button
+                            onClick={() => document.documentElement.requestFullscreen().catch(console.error)}
+                            className="bg-red-600 hover:bg-red-500 text-black px-8 py-3 font-bold font-mono tracking-widest rounded transition-all"
+                        >
+                            RESTORE SECURE VIEW
                         </button>
                     </div>
                 </div>
@@ -678,7 +464,7 @@ export default function QuestionsPage() {
             )}
 
             {/* --- MAIN CONTENT (Blurred when modal active) --- */}
-            <div className={`h-full w-full flex flex-col transition-all duration-500 ${showError || showSuccess || showLockdown || activeTokenQuestion || clueMessage ? 'blur-md brightness-50 scale-[0.99]' : ''}`}>
+            <div className={`h-full w-full flex flex-col transition-all duration-500 ${showError || showSuccess || showLockdown || activeTokenQuestion || clueMessage || (!isFullscreen && !isGameComplete) ? 'blur-md brightness-50 scale-[0.99]' : ''}`}>
 
                 {/* Timer & Level Indicator */}
                 <div className="absolute top-20 right-4 md:right-10 z-50 pointer-events-none flex flex-col md:flex-row gap-2 md:gap-4 items-end">

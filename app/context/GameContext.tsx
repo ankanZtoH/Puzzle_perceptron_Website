@@ -18,6 +18,12 @@ interface GameContextType {
     disqualifyUser: () => void;
     userName: string;
     setUserName: (name: string) => void;
+    gameWon: boolean;
+    setGameWon: (won: boolean) => void;
+    finalTime: number;
+    setFinalTime: (time: number) => void;
+    usedClues: Record<number, ('easy' | 'hard' | 'skip')[]>;
+    markClueUsed: (questionId: number, type: 'easy' | 'hard' | 'skip') => void;
 }
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
@@ -32,6 +38,8 @@ export const GameProvider = ({ children }: { children: React.ReactNode }) => {
     });
 
     const [isDisqualified, setIsDisqualified] = useState(false);
+    const [gameWon, setGameWon] = useState(false);
+    const [finalTime, setFinalTime] = useState(0);
 
     const resetLevelTokens = (levelIndex: number) => {
         // Levels 1-3 (index 0-2): 2 Easy per page
@@ -42,7 +50,7 @@ export const GameProvider = ({ children }: { children: React.ReactNode }) => {
             const isHardLevel = levelIndex >= 3;
             return {
                 easy: 2,
-                hard: isHardLevel ? 5 : 0,
+                hard: isHardLevel ? 2 : 0,
                 skip: prev.skip // Preserve global skip count
             };
         });
@@ -68,6 +76,15 @@ export const GameProvider = ({ children }: { children: React.ReactNode }) => {
         setIsDisqualified(true);
     };
 
+    const [usedClues, setUsedClues] = useState<Record<number, ('easy' | 'hard' | 'skip')[]>>({});
+
+    const markClueUsed = (questionId: number, type: 'easy' | 'hard' | 'skip') => {
+        setUsedClues(prev => ({
+            ...prev,
+            [questionId]: [...(prev[questionId] || []), type]
+        }));
+    };
+
     return (
         <GameContext.Provider value={{
             rewards,
@@ -78,7 +95,13 @@ export const GameProvider = ({ children }: { children: React.ReactNode }) => {
             isDisqualified,
             disqualifyUser,
             userName,
-            setUserName
+            setUserName,
+            gameWon,
+            setGameWon,
+            finalTime,
+            setFinalTime,
+            usedClues,
+            markClueUsed
         }}>
             {children}
         </GameContext.Provider>

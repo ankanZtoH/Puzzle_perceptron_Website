@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Orbitron, Rajdhani } from 'next/font/google';
 import { useGame } from '../context/GameContext';
@@ -9,6 +10,7 @@ const orbitron = Orbitron({ subsets: ["latin"] });
 const rajdhani = Rajdhani({ weight: ["300", "400", "500", "600", "700"], subsets: ["latin"] });
 
 export default function RulesPage() {
+    const router = useRouter();
     const [accepted, setAccepted] = useState(false);
     const { userName } = useGame();
 
@@ -76,7 +78,7 @@ export default function RulesPage() {
                                     <div className="font-bold text-zinc-400">Level Allocations (Refreshes per Level):</div>
                                     <ul className="list-disc list-inside pl-2 space-y-1 text-zinc-300">
                                         <li><span className="text-zinc-500">Levels 1-3:</span> 2 Easy Tokens</li>
-                                        <li><span className="text-zinc-500">Levels 4-5:</span> 2 Easy + 5 Hard Tokens</li>
+                                        <li><span className="text-zinc-500">Levels 4-5:</span> 2 Easy + 2 Hard Tokens</li>
                                     </ul>
                                     <div className="border-t border-zinc-700/50 pt-2 mt-2">
                                         <span className="text-zinc-400">Global Limit:</span> 3 Auto-Solve (Skip) tokens total across the entire game.
@@ -112,11 +114,16 @@ export default function RulesPage() {
                         </Link>
 
                         {accepted ? (
-                            <Link href="/questions" className="flex-1 md:flex-none">
-                                <button className="w-full md:w-auto px-10 py-4 bg-green-600 hover:bg-green-500 text-black font-bold font-mono tracking-widest shadow-[0_0_20px_rgba(34,197,94,0.4)] transition-all animate-pulse cursor-pointer">
-                                    START
-                                </button>
-                            </Link>
+                            <button
+                                onClick={() => {
+                                    document.documentElement.requestFullscreen().catch((err) => {
+                                        console.log("Full screen request denied:", err);
+                                    });
+                                    router.push("/questions");
+                                }}
+                                className="flex-1 md:flex-none w-full md:w-auto px-10 py-4 bg-green-600 hover:bg-green-500 text-black font-bold font-mono tracking-widest shadow-[0_0_20px_rgba(34,197,94,0.4)] transition-all animate-pulse cursor-pointer">
+                                START
+                            </button>
                         ) : (
                             <button disabled className="flex-1 md:flex-none w-full md:w-auto px-10 py-4 bg-zinc-900 border border-zinc-800 text-zinc-600 font-bold font-mono tracking-widest cursor-not-allowed opacity-50">
                                 LOCATING USER...
