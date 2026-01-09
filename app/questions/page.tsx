@@ -65,13 +65,14 @@ export default function QuestionsPage() {
         useToken,
         addReward,
         resetLevelTokens,
-        disqualifyUser,
-        isDisqualified,
         userName,
         setGameWon,
         setFinalTime,
         usedClues,
-        markClueUsed
+        markClueUsed,
+        setLevelsCleared,
+        markQuestionSolved,
+        solvedQuestionIds
     } = useGame(); // Use Global State
     const router = useRouter(); // Use Router
     const [currentLevelIndex, setCurrentLevelIndex] = useState(0);
@@ -125,13 +126,8 @@ export default function QuestionsPage() {
         };
         window.addEventListener('keydown', handleKeyDown);
 
-        // Warn on unload & DISQUALIFY
+        // Warn on unload (Standard Browser Warning)
         const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-            // Note: Normal in-app navigation (Next.js Link/router) does NOT trigger this.
-            // Only Refresh, Close Tab, or Back/Forward triggers this.
-            if (!isGameComplete && !isDisqualified) {
-                disqualifyUser();
-            }
             e.preventDefault();
             e.returnValue = '';
         };
@@ -155,36 +151,48 @@ export default function QuestionsPage() {
         document.addEventListener("fullscreenchange", checkFullscreen);
         checkFullscreen(); // Initial check
 
-        // Visibility Change (Anti-Cheat)
-        const handleVisibilityChange = () => {
-            if (document.hidden) {
-                // User switched tabs or minimized window
-                disqualifyUser();
-                router.push("/result");
-            }
-        };
-        document.addEventListener("visibilitychange", handleVisibilityChange);
 
         return () => {
             window.removeEventListener("popstate", handlePopState);
             window.removeEventListener("keydown", handleKeyDown);
             window.removeEventListener("beforeunload", handleBeforeUnload);
             document.removeEventListener("fullscreenchange", checkFullscreen);
-            document.removeEventListener("visibilitychange", handleVisibilityChange);
         };
-    }, [disqualifyUser, router, isGameComplete, isDisqualified]);
+    }, [router, isGameComplete]);
     // Check if already disqualified
-    useEffect(() => {
-        if (isDisqualified) {
-            router.push("/result");
-        }
-    }, [isDisqualified, router]);
+
 
     useEffect(() => {
-        if (timeLeft <= 0) return;
+        if (isGameComplete) return; // Prevent re-execution loop
+
+        if (timeLeft <= 0) {
+            // Calculate pending rewards for current level before timeout
+            let currentLevelReward = 0;
+            currentLevel.questions.forEach(q => {
+                const isSolved = solvedQuestionIds.includes(q.id);
+                const isSkipped = usedClues[q.id]?.includes('skip');
+
+                if (isSolved && !isSkipped) {
+                    currentLevelReward += 80;
+                }
+            });
+
+            if (currentLevelReward > 0) {
+                addReward(currentLevelReward);
+            }
+
+            setFinalTime(0); // Time is up
+            setIsGameComplete(true);
+
+            // Allow state updates to propagate
+            setTimeout(() => {
+                router.push('/result');
+            }, 500);
+            return;
+        }
         const timer = setInterval(() => setTimeLeft(p => p - 1), 1000);
         return () => clearInterval(timer);
-    }, [timeLeft]);
+    }, [timeLeft, router, setFinalTime, currentLevel, solvedQuestionIds, usedClues, addReward, isGameComplete]);
 
     // Reset inputs when level changes
     useEffect(() => {
@@ -213,6 +221,10 @@ export default function QuestionsPage() {
         if (!question) return;
 
         const isCorrect = normalizeAnswer(userAnswer) === normalizeAnswer(question.a);
+
+        if (isCorrect) {
+            markQuestionSolved(questionId);
+        }
 
         setValidationStatus(prev => ({
             ...prev,
@@ -256,8 +268,22 @@ export default function QuestionsPage() {
                     addReward(reward);
                 }
 
+                setLevelsCleared(currentLevelIndex + 1); // Track completion
                 setCurrentLevelIndex(prev => prev + 1);
             } else {
+                // Determine rewards for the final level
+                let skippedCount = 0;
+                currentLevel.questions.forEach(q => {
+                    if (usedClues[q.id]?.includes('skip')) {
+                        skippedCount++;
+                    }
+                });
+                const manualSolvedCount = currentLevel.questions.length - skippedCount;
+                const reward = manualSolvedCount * 80;
+                if (reward > 0) {
+                    addReward(reward);
+                }
+
                 // 🔴 FINAL LEVEL COMPLETED — CALL BACKEND HERE 🔴
 
                 // try {
@@ -284,7 +310,12 @@ export default function QuestionsPage() {
                 setIsGameComplete(true);
                 setGameWon(true);
                 setFinalTime(timeLeft);
-                router.push("/result");
+                setLevelsCleared(levels.length); // All levels cleared
+
+                // Allow state updates to propagate before navigating
+                setTimeout(() => {
+                    router.push("/result");
+                }, 500);
             }
 
         } else {
@@ -633,7 +664,6 @@ export default function QuestionsPage() {
                                                         {validationStatus[q.id] === 'incorrect' && (
                                                             <span className="text-red-500 font-bold font-mono text-sm animate-pulse">✗ Wrong Answer</span>
                                                         )}
-
                                                         <button
                                                             type="button"
                                                             onClick={() => handleValidate(q.id)}

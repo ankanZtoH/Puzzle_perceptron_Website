@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 
 type TokenType = 'easy' | 'hard' | 'skip';
 
@@ -14,16 +14,18 @@ interface GameContextType {
     useToken: (type: TokenType, cost: number) => boolean;
     addReward: (amount: number) => void;
     resetLevelTokens: (levelIndex: number) => void;
-    isDisqualified: boolean;
-    disqualifyUser: () => void;
     userName: string;
     setUserName: (name: string) => void;
     gameWon: boolean;
     setGameWon: (won: boolean) => void;
     finalTime: number;
     setFinalTime: (time: number) => void;
+    levelsCleared: number;
+    setLevelsCleared: (count: number) => void;
     usedClues: Record<number, ('easy' | 'hard' | 'skip')[]>;
     markClueUsed: (questionId: number, type: 'easy' | 'hard' | 'skip') => void;
+    solvedQuestionIds: number[];
+    markQuestionSolved: (questionId: number) => void;
 }
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
@@ -37,11 +39,12 @@ export const GameProvider = ({ children }: { children: React.ReactNode }) => {
         skip: 3, // 3 Global Skip tokens
     });
 
-    const [isDisqualified, setIsDisqualified] = useState(false);
     const [gameWon, setGameWon] = useState(false);
     const [finalTime, setFinalTime] = useState(0);
+    const [levelsCleared, setLevelsCleared] = useState(0);
+    const [solvedQuestionIds, setSolvedQuestionIds] = useState<number[]>([]);
 
-    const resetLevelTokens = (levelIndex: number) => {
+    const resetLevelTokens = useCallback((levelIndex: number) => {
         // Levels 1-3 (index 0-2): 2 Easy per page
         // Levels 4-5 (index 3-4): 2 Easy + 1 Hard per page
         // Skip is global, so we preserve its current value
@@ -54,9 +57,9 @@ export const GameProvider = ({ children }: { children: React.ReactNode }) => {
                 skip: prev.skip // Preserve global skip count
             };
         });
-    };
+    }, []);
 
-    const useToken = (type: TokenType, cost: number): boolean => {
+    const useToken = useCallback((type: TokenType, cost: number): boolean => {
         if (tokens[type] > 0 && rewards >= cost) {
             setTokens(prev => ({
                 ...prev,
@@ -66,24 +69,28 @@ export const GameProvider = ({ children }: { children: React.ReactNode }) => {
             return true;
         }
         return false;
-    };
+    }, [tokens, rewards]);
 
-    const addReward = (amount: number) => {
+    const addReward = useCallback((amount: number) => {
         setRewards(prev => prev + amount);
-    };
+    }, []);
 
-    const disqualifyUser = () => {
-        setIsDisqualified(true);
-    };
 
     const [usedClues, setUsedClues] = useState<Record<number, ('easy' | 'hard' | 'skip')[]>>({});
 
-    const markClueUsed = (questionId: number, type: 'easy' | 'hard' | 'skip') => {
+    const markClueUsed = useCallback((questionId: number, type: 'easy' | 'hard' | 'skip') => {
         setUsedClues(prev => ({
             ...prev,
             [questionId]: [...(prev[questionId] || []), type]
         }));
-    };
+    }, []);
+
+    const markQuestionSolved = useCallback((questionId: number) => {
+        setSolvedQuestionIds(prev => {
+            if (prev.includes(questionId)) return prev;
+            return [...prev, questionId];
+        });
+    }, []);
 
     return (
         <GameContext.Provider value={{
@@ -92,16 +99,18 @@ export const GameProvider = ({ children }: { children: React.ReactNode }) => {
             useToken,
             addReward,
             resetLevelTokens,
-            isDisqualified,
-            disqualifyUser,
             userName,
             setUserName,
             gameWon,
             setGameWon,
             finalTime,
             setFinalTime,
+            levelsCleared,
+            setLevelsCleared,
             usedClues,
-            markClueUsed
+            markClueUsed,
+            solvedQuestionIds,
+            markQuestionSolved
         }}>
             {children}
         </GameContext.Provider>
