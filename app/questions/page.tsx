@@ -77,6 +77,7 @@ export default function QuestionsPage() {
     const [currentLevelIndex, setCurrentLevelIndex] = useState(0);
     const [passwordInput, setPasswordInput] = useState("");
     const [answers, setAnswers] = useState<Record<number, string>>({});
+    const [validationStatus, setValidationStatus] = useState<Record<number, 'correct' | 'incorrect' | null>>({});
     const scrollContainerRef = useRef<HTMLDivElement>(null);
 
     // UI States
@@ -110,8 +111,27 @@ export default function QuestionsPage() {
         };
         window.addEventListener("popstate", handlePopState);
 
-        // Warn on unload
+        // Block Refresh Shortcuts (F5, Ctrl+R, Cmd+R) & Escape
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (
+                e.key === 'F5' ||
+                (e.ctrlKey && e.key === 'r') ||
+                (e.metaKey && e.key === 'r') ||
+                e.key === 'Escape'
+            ) {
+                e.preventDefault();
+                // Optional: Show a warning or just silently block
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+
+        // Warn on unload & DISQUALIFY
         const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+            // Note: Normal in-app navigation (Next.js Link/router) does NOT trigger this.
+            // Only Refresh, Close Tab, or Back/Forward triggers this.
+            if (!isGameComplete && !isDisqualified) {
+                disqualifyUser();
+            }
             e.preventDefault();
             e.returnValue = '';
         };
@@ -123,6 +143,13 @@ export default function QuestionsPage() {
                 setIsFullscreen(false);
             } else {
                 setIsFullscreen(true);
+                // Attempt to lock keyboard (Chrome/Edge only)
+                // This prevents ESC from exiting fullscreen
+                const nav = navigator as any;
+                if (nav.keyboard && typeof nav.keyboard.lock === 'function') {
+                    nav.keyboard.lock(['Escape'])
+                        .catch((err: any) => console.log("Keyboard lock failed:", err));
+                }
             }
         };
         document.addEventListener("fullscreenchange", checkFullscreen);
@@ -140,12 +167,12 @@ export default function QuestionsPage() {
 
         return () => {
             window.removeEventListener("popstate", handlePopState);
+            window.removeEventListener("keydown", handleKeyDown);
             window.removeEventListener("beforeunload", handleBeforeUnload);
             document.removeEventListener("fullscreenchange", checkFullscreen);
             document.removeEventListener("visibilitychange", handleVisibilityChange);
         };
-    }, [disqualifyUser, router]);
-
+    }, [disqualifyUser, router, isGameComplete, isDisqualified]);
     // Check if already disqualified
     useEffect(() => {
         if (isDisqualified) {
@@ -176,6 +203,22 @@ export default function QuestionsPage() {
     };
 
     const cleanString = (str: string) => str.replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
+    const normalizeAnswer = (str: string) => str.trim().toLowerCase();
+
+    const handleValidate = (questionId: number) => {
+        const userAnswer = answers[questionId];
+        if (!userAnswer) return;
+
+        const question = currentLevel.questions.find(q => q.id === questionId);
+        if (!question) return;
+
+        const isCorrect = normalizeAnswer(userAnswer) === normalizeAnswer(question.a);
+
+        setValidationStatus(prev => ({
+            ...prev,
+            [questionId]: isCorrect ? 'correct' : 'incorrect'
+        }));
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -502,6 +545,7 @@ export default function QuestionsPage() {
                                                         {q.q}
                                                     </label>
 
+
                                                     {/* PROMPT: TOKEN BUTTON */}
                                                     <button
                                                         type="button"
@@ -546,18 +590,60 @@ export default function QuestionsPage() {
                                                                     </div>
                                                                 </button>
                                                             ))}
+
                                                         </div>
                                                     ) : (
-                                                        <input
-                                                            type="text"
-                                                            id={`q-${q.id}`}
-                                                            placeholder={q.p}
-                                                            value={answers[q.id] || ""}
-                                                            onChange={(e) => handleInputChange(q.id, e.target.value)}
-                                                            className="w-full bg-transparent border-b border-zinc-800 px-0 py-3 text-base md:text-lg text-white placeholder-zinc-700 focus:outline-none focus:border-red-600 transition-all duration-300 font-mono"
-                                                        />
+                                                        <div className="flex flex-col gap-2">
+                                                            <input
+                                                                type="text"
+                                                                id={`q-${q.id}`}
+                                                                placeholder={q.p}
+                                                                value={answers[q.id] || ""}
+                                                                onChange={(e) => handleInputChange(q.id, e.target.value)}
+                                                                className="w-full bg-transparent border-b border-zinc-800 px-0 py-3 text-base md:text-lg text-white placeholder-zinc-700 focus:outline-none focus:border-red-600 transition-all duration-300 font-mono"
+                                                            />
+                                                        </div>
                                                     )}
                                                 </div>
+
+                                                {/* UNIFIED BOTTOM FOOTER: Clues (Left) + Validate (Right) */}
+                                                <div className="flex flex-col md:flex-row justify-between items-end mt-6 gap-4">
+
+                                                    {/* CLUES DISPLAY - Left Side */}
+                                                    <div className="flex-1 w-full flex flex-col gap-2">
+                                                        {usedClues[q.id]?.includes('easy') && (
+                                                            <div className="p-3 bg-blue-900/20 border border-blue-500/30 rounded text-blue-400 font-mono text-sm backdrop-blur-sm self-start max-w-xl">
+                                                                <strong className="block text-xs uppercase tracking-wider mb-1 text-blue-300">Easy Clue:</strong>
+                                                                {q.easyClue}
+                                                            </div>
+                                                        )}
+                                                        {usedClues[q.id]?.includes('hard') && (
+                                                            <div className="p-3 bg-red-900/20 border border-red-500/30 rounded text-red-400 font-mono text-sm backdrop-blur-sm self-start max-w-xl">
+                                                                <strong className="block text-xs uppercase tracking-wider mb-1 text-red-300">Hard Clue:</strong>
+                                                                {q.hardClue}
+                                                            </div>
+                                                        )}
+                                                    </div>
+
+                                                    {/* VALIDATE BUTTON AREA - Right Side */}
+                                                    <div className="flex flex-col items-end gap-2 flex-shrink-0">
+                                                        {validationStatus[q.id] === 'correct' && (
+                                                            <span className="text-green-500 font-bold font-mono text-sm animate-pulse">✓ Right Answer</span>
+                                                        )}
+                                                        {validationStatus[q.id] === 'incorrect' && (
+                                                            <span className="text-red-500 font-bold font-mono text-sm animate-pulse">✗ Wrong Answer</span>
+                                                        )}
+
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => handleValidate(q.id)}
+                                                            className="px-6 py-2 bg-zinc-800 text-zinc-300 border border-zinc-600 rounded hover:bg-zinc-700 font-mono text-sm uppercase tracking-wider whitespace-nowrap transition-all active:scale-95"
+                                                        >
+                                                            Validate
+                                                        </button>
+                                                    </div>
+                                                </div>
+
                                             </div>
                                         </div>
                                     </div>

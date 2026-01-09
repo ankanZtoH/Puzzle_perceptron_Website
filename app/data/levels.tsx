@@ -41,7 +41,7 @@ export const levels: { id: number; name: string; questions: Question[] }[] = [
             {
                 id: 3,
                 type: "text",
-                q: "At 3:20, what is the angle between the hour and minute hands? (Answer in degrees, e.g., 20)",
+                q: "At 3:20, what is the angle between the hour and minute hands? (Answer in degrees, e.g., 20 , Give me just the number, no word is required.)",
                 p: "Degrees...",
                 a: "20",
                 easyClue: "Calculate angle for both hands keeping in mind the fact that both hands are moving continuously.",
@@ -74,9 +74,9 @@ export const levels: { id: number; name: string; questions: Question[] }[] = [
             {
                 id: 6,
                 type: "text",
-                q: "On an island, every person either always tells truth or always lies. You meet two people, A and B. A says: \"At least one of us is a liar.\" B says: \"A is a liar.\" Who is who?",
+                q: "On an island, every person either always tells truth or always lies. You meet two people, A and B. A says: \"At least one of us is a liar.\" B says: \"A is a liar.\" Who is the liar?",
                 p: "Answer...",
-                a: "A is truth-teller, B is liar",
+                a: "B",
                 easyClue: "Test both possibilities for A.",
                 hardClue: ""
             },
@@ -161,7 +161,7 @@ export const levels: { id: number; name: string; questions: Question[] }[] = [
             {
                 id: 15,
                 type: "text",
-                q: "3×4=8\n4 × 5 = 50\n5 × 6 = 30\n6 × 7 = 49\n7 × 8 =?",
+                q: "3 × 4 = 8\n4 × 5 = 50\n5 × 6 = 30\n6 × 7 = 49\n7 × 8 = ?",
                 p: "Number...",
                 a: "228",
                 easyClue: "Find gcd of some kind of their product and 6 (for each).",
@@ -194,10 +194,10 @@ export const levels: { id: number; name: string; questions: Question[] }[] = [
             {
                 id: 18,
                 type: "text",
-                q: "You have a table of 100 coins, where 80 coins are faced heads up and 20 coins are faced tails up. You can't tell about the upper face of the coin by just looking or touching the coin. You need to distribute the coins in 2 sets such that each set has the same number of tails faced upwards. What would be the minimum number of coins in a set to make that happen.",
+                q: "A man stumbles into a dark cave and sees a troll guarding 100 coins in a pile. Each coin is perfectly identical. Each coin has a silver side and a gold side. The coins are all placed with the gold side up except for twenty which are silver side up.\nThe troll says the man must create two separate piles with the same number of silver side up coins. Failure to do so will result in death.The troll then blows out his torch rendering the cave completely dark.\nThe man completes the task with 100 % certainty and is set free.How many minimum coins are in a pile after the man completed his task?\n(The man cannot see in the dark or recall the position of any silver coin)",
                 p: "Number...",
                 a: "20",
-                easyClue: "You don't need to know which coins are tails to control how many tails you get.",
+                easyClue: "You don’t need to know which coins are tails to control how many tails you get.",
                 hardClue: "Assume a fixed number of coins for the first set and let the second set be everything else."
             },
             {
@@ -231,49 +231,49 @@ export const levels: { id: number; name: string; questions: Question[] }[] = [
                 p: "Answer...",
                 a: "Infinity",
                 easyClue: (
-                    <div className= "flex flex-col items-center" >
-                    <p>Compute the expectation<span className = "inline-block bg-white px-2 rounded text-black">< InlineMath math = "\sum x p(x)" /> </span> over N games as N {'->'} infinity.</p >
+                    <div className="flex flex-col items-center" >
+                        <p>Compute the expectation<span className="inline-block bg-white px-2 rounded text-black">< InlineMath math="\sum x p(x)" /> </span> over N games as N {'->'} infinity.</p >
                     </div>
                 ),
-hardClue: "The expectation diverges."
+                hardClue: "The expectation diverges."
             },
-{
-    id: 22,
-        type: "text",
-            q: "Three friends need to reach Kolkata from Purulia, which is about 300km away in such a way, that they reach Kolkata at the same time. They only have a bike where tripling is not allowed and can carry a maximum of 2 people. Now, the bike moves at a constant speed of 30kmph while they all walk at a constant speed of 10 kmph. What time would they reach Kolkata if they start their journey from Purulia at around 8am? (Write answer as in a 24-hr digital clock format, eg, 13:30, 07:50 etc)",
+            {
+                id: 22,
+                type: "text",
+                q: "Three friends need to reach Kolkata from Purulia, which is about 300km away in such a way, that they reach Kolkata at the same time. They only have a bike where tripling is not allowed and can carry a maximum of 2 people. Now, the bike moves at a constant speed of 30kmph while they all walk at a constant speed of 10 kmph. What is the shortest time in which all of them would reach Kolkata (at the same time) if they start their journey from Purulia at exactly 8am? (Write answer as in a 24-hr digital clock format, eg, 13:30, 07:50, 00:22 etc)",
                 p: "Time...",
-                    a: "12:40",
-                        easyClue: "If you assume the bike always moves forward, you've already made a mistake.",
-                            hardClue: "To keep all three together, the bike must sometimes travel in the opposite direction."
-},
-{
-    id: 23,
-        type: "text",
-            q: "You have 25 horses and a race track and you want to find the top 3 fast horses among them. What minimum of race is required for finding that given that at a time only 5 horses can participate in the track and you are not provided with any race instrument except a pistol for starting and ribbon at the finish line. Provided all horses run at the same speed for all races.",
+                a: "00:40",
+                easyClue: "Bike doesnt always need to move forward and if someone has already reached at destination while the others haven’t, its not optimal.",
+                hardClue: "To reach all three together in an optimal way, one of the passengers needs to get out before reaching the destination and the bike should go back to take another person."
+            },
+            {
+                id: 23,
+                type: "text",
+                q: "You have 25 horses and a race track and you want to find the top 3 fast horses among them. What minimum of race is required for finding that given that at a time only 5 horses can participate in the track and you are not provided with any race instrument except a pistol for starting and ribbon at the finish line. Provided all horses run at the same speed for all races.",
                 p: "Number...",
-                    a: "7",
-                        easyClue: "Don't try to find the fastest horse directly. First, eliminate the slowest ones in batches.",
-                            hardClue: "Race the horses in fixed groups and remember the order within each group."
-},
-{
-    id: 24,
-        type: "text",
-            q: "A circle has 3 points chosen uniformly at random on its circumference. What is the probability that the triangle formed contains the center of the circle? (Write answer in words, eg,: if answer is 0.5 write zero point five, if answer is 2.33 write two point three three etc.)",
+                a: "7",
+                easyClue: "Don't try to find the fastest horse directly. First, eliminate the slowest ones in batches.",
+                hardClue: "Race the horses in fixed groups and remember the order within each group."
+            },
+            {
+                id: 24,
+                type: "text",
+                q: "A circle has 3 points chosen uniformly at random on its circumference. What is the probability that the triangle formed contains the center of the circle? (Write answer in words, eg,: if answer is 0.5 write zero point five, if answer is 2.33 write two point three three etc.)",
                 p: "Probability...",
-                    a: "Zero point two five",
-                        easyClue: "Think arcs.",
-                            hardClue: "No arc >= 180 degrees."
-},
-{
-    id: 25,
-        type: "text",
-            q: "You have 50 people lined up in a room as given in the image. Each person is either a truth-teller, who always tells the truth, or a liar, who always lies. Each person knows the type of everyone else. The following image shows the statements of each person. Which of the person (s) is/are lying?",
+                a: "Zero point two five",
+                easyClue: "Think arcs.",
+                hardClue: "No arc >= 180 degrees."
+            },
+            {
+                id: 25,
+                type: "text",
+                q: "You have 50 people lined up in a room as given in the image. Each person is either a truth-teller, who always tells the truth, or a liar, who always lies. Each person knows the type of everyone else. The following image shows the statements of each person. Which of the person (s) is/are lying?",
                 p: "Number...",
-                    a: "2",
-                        easyClue: "Is person 50 a liar? If yes, what does that tell us about person 49?",
-                            hardClue: "From the first clue can we find out if 47 is a liar?",
-                                image: "/extracted_images-002.png"
-},
+                a: "2",
+                easyClue: "Is person 50 a liar? If yes, what does that tell us about person 49?",
+                hardClue: "From the first clue can we find out if 47 is a liar?",
+                image: "/extracted_images-002.png"
+            },
         ]
     }
 ];
