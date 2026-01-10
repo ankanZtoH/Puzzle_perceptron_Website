@@ -62,17 +62,17 @@ export default function TokenModal({ isOpen, onClose, onSelect, showHardToken = 
                         </div>
                         <div className="mt-auto w-full space-y-2">
                             <div className="flex justify-between text-xs font-mono text-zinc-300">
-                                <span>COST:</span> <span className="text-yellow-400">50 PTS</span>
+                                <span>COST:</span> <span className="text-yellow-400">40 PTS</span>
                             </div>
                             <div className="flex justify-between text-xs font-mono text-zinc-300">
                                 <span>REMAINING:</span> <span className="text-white">{tokens.easy}</span>
                             </div>
                             <button
-                                onClick={() => handleSelect('easy', 50)}
-                                disabled={getButtonState('easy', 50).disabled}
-                                className={`w-full py-2 font-bold text-sm rounded ${getButtonState('easy', 50).disabled ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed' : 'bg-green-600 hover:bg-green-500 text-black'}`}
+                                onClick={() => handleSelect('easy', 40)}
+                                disabled={getButtonState('easy', 40).disabled}
+                                className={`w-full py-2 font-bold text-sm rounded ${getButtonState('easy', 40).disabled ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed' : 'bg-green-600 hover:bg-green-500 text-black'}`}
                             >
-                                {getButtonState('easy', 50).text}
+                                {getButtonState('easy', 40).text}
                             </button>
                         </div>
                     </div>
@@ -87,17 +87,17 @@ export default function TokenModal({ isOpen, onClose, onSelect, showHardToken = 
                             </div>
                             <div className="mt-auto w-full space-y-2">
                                 <div className="flex justify-between text-xs font-mono text-zinc-300">
-                                    <span>COST:</span> <span className="text-yellow-400">100 PTS</span>
+                                    <span>COST:</span> <span className="text-yellow-400">60 PTS</span>
                                 </div>
                                 <div className="flex justify-between text-xs font-mono text-zinc-300">
                                     <span>REMAINING:</span> <span className="text-white">{tokens.hard}</span>
                                 </div>
                                 <button
-                                    onClick={() => handleSelect('hard', 100)}
-                                    disabled={getButtonState('hard', 100).disabled}
-                                    className={`w-full py-2 font-bold text-sm rounded ${getButtonState('hard', 100).disabled ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed' : 'bg-orange-600 hover:bg-orange-500 text-black'}`}
+                                    onClick={() => handleSelect('hard', 60)}
+                                    disabled={getButtonState('hard', 60).disabled}
+                                    className={`w-full py-2 font-bold text-sm rounded ${getButtonState('hard', 60).disabled ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed' : 'bg-orange-600 hover:bg-orange-500 text-black'}`}
                                 >
-                                    {getButtonState('hard', 100).text}
+                                    {getButtonState('hard', 60).text}
                                 </button>
                             </div>
                         </div>
@@ -112,17 +112,17 @@ export default function TokenModal({ isOpen, onClose, onSelect, showHardToken = 
                         </div>
                         <div className="mt-auto w-full space-y-2">
                             <div className="flex justify-between text-xs font-mono text-zinc-300">
-                                <span>COST:</span> <span className="text-yellow-400">200 PTS</span>
+                                <span>COST:</span> <span className="text-yellow-400">150 PTS</span>
                             </div>
                             <div className="flex justify-between text-xs font-mono text-zinc-300">
                                 <span>REMAINING:</span> <span className="text-white">{tokens.skip}</span>
                             </div>
                             <button
-                                onClick={() => handleSelect('skip', 200)}
-                                disabled={getButtonState('skip', 200).disabled}
-                                className={`w-full py-2 font-bold text-sm rounded ${getButtonState('skip', 200).disabled ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed' : 'bg-red-600 hover:bg-red-500 text-black'}`}
+                                onClick={() => handleSelect('skip', 150)}
+                                disabled={getButtonState('skip', 150).disabled}
+                                className={`w-full py-2 font-bold text-sm rounded ${getButtonState('skip', 150).disabled ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed' : 'bg-red-600 hover:bg-red-500 text-black'}`}
                             >
-                                {getButtonState('skip', 200).text}
+                                {getButtonState('skip', 150).text}
                             </button>
                         </div>
                     </div>

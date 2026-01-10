@@ -373,9 +373,9 @@ export default function QuestionsPage() {
         if (type !== 'skip' && usedClues[activeTokenQuestion]?.includes('skip')) return; // Redundant but safe
 
         let cost = 0;
-        if (type === 'easy') cost = 50;
-        if (type === 'hard') cost = 100;
-        if (type === 'skip') cost = 200;
+        if (type === 'easy') cost = 40;
+        if (type === 'hard') cost = 60;
+        if (type === 'skip') cost = 150;
 
         const success = useToken(type, cost);
 

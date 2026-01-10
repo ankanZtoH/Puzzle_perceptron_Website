@@ -160,8 +160,6 @@ export default function RulesPage() {
                         title="PRECISION"
                         description="All answers are case-insensitive but spelling-sensitive. Read every clue with extreme care; details matter."
                     />
-
-
                     {/* Resource Grid for Better Readability */}
                     <div className="grid md:grid-cols-2 gap-4 my-2">
                         <RuleItem
@@ -169,13 +167,13 @@ export default function RulesPage() {
                             title="RESOURCE MANAGEMENT"
                             description={
                                 <div className="space-y-1 mt-2 text-base">
-                                    <div className="flex justify-between border-b border-zinc-700/50 pb-1"><span>Initial Balance:</span> <span className="text-green-400">300 Pts</span></div>
+                                    <div className="flex justify-between border-b border-zinc-700/50 pb-1"><span>Initial Balance:</span> <span className="text-green-400">200 Pts</span></div>
                                     <div className="flex justify-between border-b border-zinc-700/50 pb-1"><span>Correct Answer:</span> <span className="text-green-400">+80 Pts</span></div>
                                     <div className="flex justify-between text-zinc-400 pt-1"><span>Usage Costs:</span></div>
                                     <div className="pl-4 text-sm space-y-1">
-                                        <div className="flex justify-between"><span>Easy Hint:</span> <span className="text-yellow-500">50 Pts</span></div>
-                                        <div className="flex justify-between"><span>Hard Hint:</span> <span className="text-orange-500">100 Pts</span></div>
-                                        <div className="flex justify-between"><span>Skip Level:</span> <span className="text-red-500">200 Pts</span></div>
+                                        <div className="flex justify-between"><span>Easy Hint:</span> <span className="text-yellow-500">40 Pts</span></div>
+                                        <div className="flex justify-between"><span>Hard Hint:</span> <span className="text-orange-500">60 Pts</span></div>
+                                        <div className="flex justify-between"><span>Skip Level:</span> <span className="text-red-500">150 Pts</span></div>
                                     </div>
                                 </div>
                             }
@@ -191,7 +189,7 @@ export default function RulesPage() {
                                         <li><span className="text-zinc-500">Levels 4-5:</span> 2 Easy + 2 Hard Tokens / level</li>
                                     </ul>
                                     <div className="border-t border-zinc-700/50 pt-2 mt-2">
-                                        <span className="text-zinc-400">Global Limit:</span> 3 Auto-Solve (Skip) tokens total across the entire game.
+                                        <span className="text-zinc-400">Global Limit:</span> 3 Auto-Solve (Skip) tokens total across the entire game. <span className="text-red-500">No point will be awarded for skipped answers.</span>
                                     </div>
                                 </div>
                             }

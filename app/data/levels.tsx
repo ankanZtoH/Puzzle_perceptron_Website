@@ -22,10 +22,10 @@ export const levels: { id: number; name: string; questions: Question[] }[] = [
             {
                 id: 1,
                 type: "text",
-                q: "What is the next term in this sequence: 1, 11, 21, 1211, 111221, ?",
-                p: "Term...",
-                a: "312211",
-                easyClue: "Read the digits aloud.",
+                q: "On an island, every person either always tells truth or always lies. You meet two people, A and B. A says: \"At least one of us is a liar.\" B says: \"A is a liar.\" Who is the liar?",
+                p: "Answer...",
+                a: "B",
+                easyClue: "Test both possibilities for A.",
                 hardClue: ""
             },
             {
@@ -53,7 +53,7 @@ export const levels: { id: number; name: string; questions: Question[] }[] = [
                 q: "You have 5 lines and 10 balls and are asked to arrange them in such a way that each line has only 4 balls and not more or less. What is the name of the design? (Just give the figure name)",
                 p: "Design...",
                 a: "Star",
-                easyClue: "If every requirement seems impossible, some things must be shared.",
+                easyClue: "Think of a shape where lines intersect at centain points, forming a pattern that resembles a celestial object.",
                 hardClue: ""
             },
             {
@@ -61,7 +61,7 @@ export const levels: { id: number; name: string; questions: Question[] }[] = [
                 type: "text",
                 q: "Cross out 10 digits from the number 1234512345123451234512345 so that the remaining no. is as large as possible.",
                 p: "Number...",
-                a: "55341234512345",
+                a: "553451234512345",
                 easyClue: "We want as many 5's left as possible.",
                 hardClue: ""
             },
@@ -74,16 +74,16 @@ export const levels: { id: number; name: string; questions: Question[] }[] = [
             {
                 id: 6,
                 type: "text",
-                q: "On an island, every person either always tells truth or always lies. You meet two people, A and B. A says: \"At least one of us is a liar.\" B says: \"A is a liar.\" Who is the liar?",
-                p: "Answer...",
-                a: "B",
-                easyClue: "Test both possibilities for A.",
+                q: "What is the next term in this sequence: 1, 11, 21, 1211, 111221, ?",
+                p: "Term...",
+                a: "312211",
+                easyClue: "Read the digits aloud.",
                 hardClue: ""
             },
             {
                 id: 7,
                 type: "text",
-                q: "Vishal met Reddy after a long time, he was pushing around two identical twins. When Reddy was asked by Vishal how he was doing after his marriage, Reddy answered that he is the happy father of his 3 sons. When asked about their age, he answered that the product of their age is 72, and the sum of ages is the birth DATE of Vishal which is on 14th January 1984. When he asked for any more information, he answered that one of his sons is playing piano. What is the age of his youngest child?",
+                q: "Vishal met Reddy after a long time, he was with his two identical twins. When Reddy was asked by Vishal how he was doing after his marriage, Reddy answered that he is the happy father of 3 sons. When asked about their age, he answered that the product of their age is 72, and the sum of ages is the birth DATE of Vishal which is on 14th January 1984. When he asked for any more information, he answered that one of his sons is playing piano. What is the age of his youngest child?",
                 p: "Number...",
                 a: "3",
                 easyClue: "The piano detail is not about music. It’s about being able to point to one specific child.",
@@ -95,7 +95,7 @@ export const levels: { id: number; name: string; questions: Question[] }[] = [
                 q: "(72, 99) -> 27\n(27, 45) -> 18\n(18, 39) -> 21\n(21, 36) -> ?\n(?, 28) -> 13\n(13, 21) -> 7. Find the missing no. based on the above pattern.",
                 p: "Number...",
                 a: "12",
-                easyClue: "The pattern is extremely simple (think fundamental mathematical operations).",
+                easyClue: "Consider the numbers in each pair and think of an extremely simple mathematical operation.",
                 hardClue: ""
             },
             {
@@ -128,7 +128,7 @@ export const levels: { id: number; name: string; questions: Question[] }[] = [
                 q: "A computer program searches for a secret number stored in memory. The number lies between 1 and 100, inclusive. The program follows a method where each comparison can only tell whether the guessed number is too high, too low, or correct. The programmer wants to guarantee that the correct number is found in the worst case, no matter what the number is. What is the minimum number of comparisons required to guarantee finding the number?",
                 p: "Number...",
                 a: "7",
-                easyClue: "Each comparison reduces the range of possible values.",
+                easyClue: "Think about how you would narrow down the range of possibilities in half with each guess.",
                 hardClue: ""
             },
             {
@@ -154,7 +154,7 @@ export const levels: { id: number; name: string; questions: Question[] }[] = [
                 type: "text",
                 q: "If you have a number of non uniform inflammable wire, which burns out in an hour, what would be the minimum no. of wires required to measure a time of about 75 mins. Point to note that non uniform inflammable means that if a wire burns out in an hour, it is not necessary that 50% of the wire is burnt out in half an hour, or quarter of the wire burns out in 15 mins.",
                 p: "Number...",
-                a: "3 wires",
+                a: "3",
                 easyClue: "You can control how long a wire lasts only by choosing how many ends you light.",
                 hardClue: ""
             },

@@ -33,7 +33,7 @@ interface GameContextType {
 const GameContext = createContext<GameContextType | undefined>(undefined);
 
 export const GameProvider = ({ children }: { children: React.ReactNode }) => {
-    const [rewards, setRewards] = useState(300); // Start with 300 points
+    const [rewards, setRewards] = useState(200); // Start with 300 points
     const [userName, setUserName] = useState("");
     const [tokens, setTokens] = useState({
         easy: 2,
