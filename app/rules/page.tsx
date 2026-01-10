@@ -39,7 +39,7 @@ export default function RulesPage() {
                     <RuleItem
                         number="01"
                         title="ZERO TOLERANCE"
-                        description="External assistance, answer sharing, or AI collaboration is strictly prohibited. Any violation will result in immediate disqualification."
+                        description="External assistance, answer sharing, or Tab switch is strictly prohibited. Any violation will result in immediate disqualification."
                     />
                     <RuleItem
                         number="02"
@@ -65,7 +65,7 @@ export default function RulesPage() {
                                     <div className="pl-4 text-sm space-y-1">
                                         <div className="flex justify-between"><span>Easy Hint:</span> <span className="text-yellow-500">50 Pts</span></div>
                                         <div className="flex justify-between"><span>Hard Hint:</span> <span className="text-orange-500">100 Pts</span></div>
-                                        <div className="flex justify-between"><span>Skip Level:</span> <span className="text-red-500">250 Pts</span></div>
+                                        <div className="flex justify-between"><span>Skip Level:</span> <span className="text-red-500">200 Pts</span></div>
                                     </div>
                                 </div>
                             }
@@ -77,8 +77,8 @@ export default function RulesPage() {
                                 <div className="space-y-1 mt-2 text-base">
                                     <div className="font-bold text-zinc-400">Level Allocations (Refreshes per Level):</div>
                                     <ul className="list-disc list-inside pl-2 space-y-1 text-zinc-300">
-                                        <li><span className="text-zinc-500">Levels 1-3:</span> 2 Easy Tokens</li>
-                                        <li><span className="text-zinc-500">Levels 4-5:</span> 2 Easy + 2 Hard Tokens</li>
+                                        <li><span className="text-zinc-500">Levels 1-3:</span> 2 Easy Tokens / Level</li>
+                                        <li><span className="text-zinc-500">Levels 4-5:</span> 2 Easy + 2 Hard Tokens / level</li>
                                     </ul>
                                     <div className="border-t border-zinc-700/50 pt-2 mt-2">
                                         <span className="text-zinc-400">Global Limit:</span> 3 Auto-Solve (Skip) tokens total across the entire game.

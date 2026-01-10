@@ -354,7 +354,7 @@ export default function QuestionsPage() {
         let cost = 0;
         if (type === 'easy') cost = 50;
         if (type === 'hard') cost = 100;
-        if (type === 'skip') cost = 250;
+        if (type === 'skip') cost = 200;
 
         const success = useToken(type, cost);
 
