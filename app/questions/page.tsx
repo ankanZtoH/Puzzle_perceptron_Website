@@ -97,7 +97,7 @@ export default function QuestionsPage() {
     const [activeTokenQuestion, setActiveTokenQuestion] = useState<number | null>(null);
     // const [usedClues, setUsedClues] = useState<Record<number, ('easy' | 'hard' | 'skip')[]>>({}); // MOVED TO CONTEXT
     const [clueMessage, setClueMessage] = useState<React.ReactNode | null>(null);
-    const [timeLeft, setTimeLeft] = useState(60000); // 90 minutes in milliseconds
+    const [timeLeft, setTimeLeft] = useState(5400000); // 90 minutes in milliseconds
     const [showRules, setShowRules] = useState(false);
     const [isFullscreen, setIsFullscreen] = useState(true);
 
