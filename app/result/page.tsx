@@ -18,10 +18,11 @@ export default function ResultPage() {
         }
     }, [gameWon, router]);
 
-    const formatTime = (seconds: number) => {
-        const min = Math.floor(seconds / 60).toString().padStart(2, '0');
-        const sec = (seconds % 60).toString().padStart(2, '0');
-        return `${min}:${sec}`;
+    const formatTime = (ms: number) => {
+        const min = Math.floor(ms / 60000).toString().padStart(2, '0');
+        const sec = Math.floor((ms % 60000) / 1000).toString().padStart(2, '0');
+        const msec = (ms % 1000).toString().padStart(3, '0');
+        return `${min}:${sec}:${msec}`;
     };
 
 
@@ -70,7 +71,7 @@ export default function ResultPage() {
                                 {formatTime(finalTime)}
                             </div>
                             <div className="text-green-600 text-lg mt-2 font-mono">
-                                {Math.floor((5400 - finalTime) / 60)} MIN {(5400 - finalTime) % 60} SEC ELAPSED
+                                {Math.floor((5400000 - finalTime) / 60000)} MIN {Math.floor(((5400000 - finalTime) % 60000) / 1000)} SEC ELAPSED
                             </div>
                         </div>
 

@@ -8,7 +8,7 @@ import TokenStatus from "@/components/TokenStatus"; // Import TokenStatus
 import "katex/dist/katex.min.css";
 import { InlineMath } from "react-katex";
 import ResultPage from "../result/page";
-
+import { supabase } from "../api/supabase"
 import { levels } from "../data/levels";
 
 
@@ -63,6 +63,7 @@ const ChipIcon = (props: React.SVGProps<SVGSVGElement>) => (
 export default function QuestionsPage() {
     const {
         useToken,
+        rewards,
         addReward,
         resetLevelTokens,
         userName,
@@ -73,7 +74,8 @@ export default function QuestionsPage() {
         setLevelsCleared,
         markQuestionSolved,
         solvedQuestionIds,
-        disqualifyUser
+        disqualifyUser,
+        finalTime
     } = useGame(); // Use Global State
     const router = useRouter(); // Use Router
     const [currentLevelIndex, setCurrentLevelIndex] = useState(0);
@@ -95,7 +97,7 @@ export default function QuestionsPage() {
     const [activeTokenQuestion, setActiveTokenQuestion] = useState<number | null>(null);
     // const [usedClues, setUsedClues] = useState<Record<number, ('easy' | 'hard' | 'skip')[]>>({}); // MOVED TO CONTEXT
     const [clueMessage, setClueMessage] = useState<React.ReactNode | null>(null);
-    const [timeLeft, setTimeLeft] = useState(5400); // 90 minutes
+    const [timeLeft, setTimeLeft] = useState(60000); // 90 minutes in milliseconds
     const [showRules, setShowRules] = useState(false);
     const [isFullscreen, setIsFullscreen] = useState(true);
 
@@ -201,6 +203,23 @@ export default function QuestionsPage() {
                 addReward(currentLevelReward);
             }
 
+            // Calculate final pending score including current level
+            const finalPendingScore = rewards + currentLevelReward;
+
+            // Format time for 0 ms
+            const formatTimeMs = (ms: number) => {
+                const min = Math.floor(ms / 60000).toString().padStart(2, '0');
+                const sec = Math.floor((ms % 60000) / 1000).toString().padStart(2, '0');
+                const msec = (ms % 1000).toString().padStart(3, '0');
+                return `${min}:${sec}:${msec}`;
+            };
+            const time = formatTimeMs(0);
+
+            const totalSolved = solvedQuestionIds.filter(id => !usedClues[id]?.includes('skip')).length;
+
+            // Save data on timeout
+            saveGameData(finalPendingScore, time, totalSolved);
+
             setFinalTime(0); // Time is up
             setIsGameComplete(true);
 
@@ -210,7 +229,7 @@ export default function QuestionsPage() {
             }, 500);
             return;
         }
-        const timer = setInterval(() => setTimeLeft(p => p - 1), 1000);
+        const timer = setInterval(() => setTimeLeft(p => Math.max(0, p - 10)), 10);
         return () => clearInterval(timer);
     }, [timeLeft, router, setFinalTime, currentLevel, solvedQuestionIds, usedClues, addReward, isGameComplete]);
 
@@ -232,6 +251,25 @@ export default function QuestionsPage() {
 
     const cleanString = (str: string) => str.replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
     const normalizeAnswer = (str: string) => str.trim().toLowerCase();
+
+    const saveGameData = async (score: number, timeStr: string, questionsSolved: number) => {
+        try {
+            const { error } = await supabase.from("puzzlePerceptron").insert({
+                team_name: userName,
+                time_remaining: timeStr,
+                score: score,
+                question_solved: questionsSolved,
+            });
+
+            if (error) {
+                console.error("Supabase error:", error.message);
+                // We might not want to alert on timeout to avoid blocking the redirect, 
+                // but logging is good.
+            }
+        } catch (err) {
+            console.error("Unexpected error saving game data:", err);
+        }
+    };
 
 
 
@@ -328,27 +366,21 @@ export default function QuestionsPage() {
                 }
 
                 // 🔴 FINAL LEVEL COMPLETED — CALL BACKEND HERE 🔴
+                const formatTimeMs = (ms: number) => {
+                    const min = Math.floor(ms / 60000).toString().padStart(2, '0');
+                    const sec = Math.floor((ms % 60000) / 1000).toString().padStart(2, '0');
+                    const msec = (ms % 1000).toString().padStart(3, '0');
+                    return `${min}:${sec}:${msec}`;
+                };
 
-                // try {
-                //     const contestantId = localStorage.getItem("contestantId");
+                const finalScore = rewards + reward;
+                const time = formatTimeMs(timeLeft);
 
-                //     if (contestantId) {
-                //         await fetch("http://localhost:8000/api/finish/", {
-                //             method: "POST",
-                //             headers: {
-                //                 "Content-Type": "application/json",
-                //             },
-                //             body: JSON.stringify({
-                //                 id: contestantId,
-                //             }),
-                //         });
+                // Calculate total solved (Manual) - Ensure we include current level and exclude duplicates/skips
+                const allSolvedIds = new Set([...solvedQuestionIds, ...currentLevel.questions.map(q => q.id)]);
+                const totalSolved = Array.from(allSolvedIds).filter(id => !usedClues[id]?.includes('skip')).length;
 
-                //         // optional: prevent re-submission
-                //         localStorage.removeItem("contestantId");
-                //     }
-                // } catch (err) {
-                //     console.error("Finish API failed", err);
-                // }
+                await saveGameData(finalScore, time, totalSolved);
 
                 setIsGameComplete(true);
                 setGameWon(true);
@@ -433,19 +465,20 @@ export default function QuestionsPage() {
 
 
 
-    const formatTime = (seconds: number) => {
-        const min = Math.floor(seconds / 60).toString().padStart(2, '0');
-        const sec = (seconds % 60).toString().padStart(2, '0');
+    const formatTime = (ms: number) => {
+        const totalSeconds = Math.floor(ms / 1000);
+        const min = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
+        const sec = (totalSeconds % 60).toString().padStart(2, '0');
         return `${min}:${sec}`;
     };
 
+
     if (isGameComplete) {
+
         return (
-            // <div className="flex flex-col items-center justify-center min-h-screen bg-black text-white font-mono">
-            //     <h1 className="text-6xl text-green-500 font-bold mb-4 animate-bounce">SYSTEM HACKED</h1>
-            //     <p className="mt-8 text-2xl text-white">CONGRATULATIONS, USER.</p>
-            // </div>
             <ResultPage />
+
+
         );
     }
 
