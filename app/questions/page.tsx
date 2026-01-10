@@ -248,6 +248,46 @@ export default function QuestionsPage() {
             return;
         }
 
+        // --- STRICT VALIDATION: Check all answers first ---
+        const newValidationStatus: Record<number, 'correct' | 'incorrect' | null> = {};
+        let allAnswersCorrect = true;
+
+        currentLevel.questions.forEach(q => {
+            const userAnswer = answers[q.id];
+            const isCorrect = userAnswer && normalizeAnswer(userAnswer) === normalizeAnswer(q.a);
+
+            newValidationStatus[q.id] = isCorrect ? 'correct' : 'incorrect';
+
+            if (isCorrect) {
+                markQuestionSolved(q.id);
+            } else {
+                allAnswersCorrect = false;
+            }
+        });
+
+        setValidationStatus(prev => ({ ...prev, ...newValidationStatus }));
+
+        if (!allAnswersCorrect) {
+            setShake(true);
+            setShowError(true);
+
+            // Increment guess count
+            const newGuessCount = guessCount + 1;
+            setGuessCount(newGuessCount);
+
+            if (newGuessCount >= 5) {
+                disqualifyUser(userName); // Permanent disqualification
+                setShowLockdown(true);
+            } else {
+                setTimeout(() => {
+                    setShake(false);
+                    setShowError(false);
+                }, 1000);
+            }
+            return; // STOP HERE if answers are wrong
+        }
+
+        // --- PASSWORD CHECK (Only runs if all answers are correct) ---
         if (cleanString(passwordInput) === levelPassword) {
             setShowSuccess(true);
 
@@ -322,39 +362,21 @@ export default function QuestionsPage() {
             }
 
         } else {
+            // Answers are correct, but Password text is wrong (Rare but possible)
             setShake(true);
             setShowError(true);
 
-            // VALIDATE ALL ANSWERS ON WRONG PASSWORD
-            const newValidationStatus: Record<number, 'correct' | 'incorrect' | null> = {};
-
-            currentLevel.questions.forEach(q => {
-                const userAnswer = answers[q.id];
-                if (userAnswer) {
-                    const isCorrect = normalizeAnswer(userAnswer) === normalizeAnswer(q.a);
-                    newValidationStatus[q.id] = isCorrect ? 'correct' : 'incorrect';
-
-                    if (isCorrect) {
-                        markQuestionSolved(q.id);
-                    }
-                }
-            });
-
-            setValidationStatus(prev => ({ ...prev, ...newValidationStatus }));
-
-            // Increment guess count
             const newGuessCount = guessCount + 1;
             setGuessCount(newGuessCount);
 
             if (newGuessCount >= 5) {
-                disqualifyUser(userName); // Permanent disqualification
+                disqualifyUser(userName);
                 setShowLockdown(true);
-                // Wait for error animation to finish before showing lockdown
             } else {
                 setTimeout(() => {
                     setShake(false);
                     setShowError(false);
-                }, 1000); // 1 second timeout
+                }, 1000);
             }
         }
     };
@@ -492,13 +514,13 @@ export default function QuestionsPage() {
                                 <div className="bg-zinc-900/50 p-4 rounded border border-zinc-800">
                                     <h3 className="text-green-500 font-bold mb-2">04. RESOURCE MANAGEMENT</h3>
                                     <div className="space-y-1 text-sm">
-                                        <div className="flex justify-between border-b border-zinc-700/50 pb-1"><span>Initial Balance:</span> <span className="text-green-400">300 Pts</span></div>
+                                        <div className="flex justify-between border-b border-zinc-700/50 pb-1"><span>Initial Balance:</span> <span className="text-green-400">200 Pts</span></div>
                                         <div className="flex justify-between border-b border-zinc-700/50 pb-1"><span>Correct Answer:</span> <span className="text-green-400">+80 Pts</span></div>
                                         <div className="flex justify-between text-zinc-400 pt-1"><span>Usage Costs:</span></div>
                                         <div className="pl-4 space-y-1">
-                                            <div className="flex justify-between"><span>Easy Hint:</span> <span className="text-yellow-500">50 Pts</span></div>
-                                            <div className="flex justify-between"><span>Hard Hint:</span> <span className="text-orange-500">100 Pts</span></div>
-                                            <div className="flex justify-between"><span>Skip Level:</span> <span className="text-red-500">200 Pts</span></div>
+                                            <div className="flex justify-between"><span>Easy Hint:</span> <span className="text-yellow-500">40 Pts</span></div>
+                                            <div className="flex justify-between"><span>Hard Hint:</span> <span className="text-orange-500">60 Pts</span></div>
+                                            <div className="flex justify-between"><span>Skip Level:</span> <span className="text-red-500">150 Pts</span></div>
                                         </div>
                                     </div>
                                 </div>
@@ -512,7 +534,7 @@ export default function QuestionsPage() {
                                             <li><span className="text-zinc-500">Levels 4-5:</span> 2 Easy + 2 Hard / Level</li>
                                         </ul>
                                         <div className="border-t border-zinc-700/50 pt-2 mt-2">
-                                            <span className="text-zinc-400">Global Limit:</span> 3 Skip tokens total.
+                                            <span className="text-zinc-400">Global Limit:</span> 3 Skip tokens total. <span className="text-red-500 font-bold">No point will be awarded for skipped answers. </span>
                                         </div>
                                     </div>
                                 </div>
@@ -656,11 +678,11 @@ export default function QuestionsPage() {
                             <h1 className="text-4xl md:text-7xl font-black mb-3 tracking-tighter text-white drop-shadow-2xl">
                                 THE GAUNTLET
                             </h1>
-                            <div className="text-red-500 font-mono text-xl tracking-[0.3em] mb-4 animate-pulse">
-                                USER:{userName || 'UNKNOWN'}
+                            <div className="font-bold text-red-500 font-mono text-xl tracking-[0.3em] mb-4 animate-pulse">
+                                TEAM : {userName || 'UNKNOWN'}
                             </div>
                             <p className="text-zinc-400 text-sm md:text-xl max-w-2xl mx-auto leading-relaxed">
-                                Solve the riddles. <span className="text-red-500 font-bold">First letter = Password.</span>
+                                <span className="text-red-500 font-bold">First letter/Digit of every question = Password. {'(ex. : XB3Y5) '}</span>
                             </p>
                         </header>
 
