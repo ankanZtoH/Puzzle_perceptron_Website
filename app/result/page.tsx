@@ -148,7 +148,16 @@ export default function ResultPage() {
                                 status = "SOLVED (EASY CLUE)";
                                 color = "text-yellow-500";
                                 bg = "bg-yellow-900/10 border-yellow-900/30";
+                            } else if (clues.includes('easy') && clues.includes("skip")) {
+                                status = "EASY + BYPASSED";
+                                color = "text-red-500";
+                                bg = "bg-red-900/10 border-red-900/30";
+                            } else if (clues.includes('hard') && clues.includes('skip')) {
+                                status = "HARD + BYPASSED";
+                                color = "text-red-500";
+                                bg = "bg-red-900/10 border-red-900/30";
                             }
+
 
                             return (
                                 <div key={q.id} className={`flex justify-between items-center p-3 border rounded ${bg}`}>

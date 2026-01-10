@@ -50,7 +50,7 @@ export const levels: { id: number; name: string; questions: Question[] }[] = [
             {
                 id: 4,
                 type: "text",
-                q: "You have 5 lines and 10 balls and are asked to arrange them in such a way that each line has only 4 balls and not more or less. What is the name of the design?",
+                q: "You have 5 lines and 10 balls and are asked to arrange them in such a way that each line has only 4 balls and not more or less. What is the name of the design? (Just give the figure name)",
                 p: "Design...",
                 a: "Star Formation",
                 easyClue: "If every requirement seems impossible, some things must be shared.",
