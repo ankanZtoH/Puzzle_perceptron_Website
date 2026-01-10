@@ -110,7 +110,7 @@ export default function NamePage() {
                     <div className="relative">
                         <input
                             type="text"
-                            placeholder="Enter your name"
+                            placeholder="Enter your Team Name"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
                             className="w-full px-6 py-4 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-all"

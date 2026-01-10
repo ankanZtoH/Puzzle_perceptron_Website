@@ -26,6 +26,8 @@ interface GameContextType {
     markClueUsed: (questionId: number, type: 'easy' | 'hard' | 'skip') => void;
     solvedQuestionIds: number[];
     markQuestionSolved: (questionId: number) => void;
+    disqualifyUser: (teamName: string) => void;
+    isTeamBanned: (teamName: string) => boolean;
 }
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
@@ -77,6 +79,36 @@ export const GameProvider = ({ children }: { children: React.ReactNode }) => {
 
 
     const [usedClues, setUsedClues] = useState<Record<number, ('easy' | 'hard' | 'skip')[]>>({});
+    const [bannedTeams, setBannedTeams] = useState<string[]>([]);
+
+    // Load banned teams from local storage on mount
+    useEffect(() => {
+        // Cleanup old legacy ban
+        localStorage.removeItem('isDisqualified');
+
+        const storedBans = localStorage.getItem('banned_teams');
+        if (storedBans) {
+            try {
+                setBannedTeams(JSON.parse(storedBans));
+            } catch (e) {
+                console.error("Failed to parse banned teams", e);
+            }
+        }
+    }, []);
+
+    const disqualifyUser = useCallback((teamName: string) => {
+        if (!teamName) return;
+
+        setBannedTeams(prev => {
+            const newBans = [...prev, teamName];
+            localStorage.setItem('banned_teams', JSON.stringify(newBans));
+            return newBans;
+        });
+    }, []);
+
+    const isTeamBanned = useCallback((teamName: string) => {
+        return bannedTeams.some(t => t.toLowerCase() === teamName.toLowerCase());
+    }, [bannedTeams]);
 
     const markClueUsed = useCallback((questionId: number, type: 'easy' | 'hard' | 'skip') => {
         setUsedClues(prev => ({
@@ -110,7 +142,9 @@ export const GameProvider = ({ children }: { children: React.ReactNode }) => {
             usedClues,
             markClueUsed,
             solvedQuestionIds,
-            markQuestionSolved
+            markQuestionSolved,
+            disqualifyUser,
+            isTeamBanned
         }}>
             {children}
         </GameContext.Provider>

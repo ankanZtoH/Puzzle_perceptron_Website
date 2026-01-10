@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Orbitron, Rajdhani } from 'next/font/google';
 import { useGame } from '../context/GameContext';
 
@@ -12,10 +12,119 @@ const rajdhani = Rajdhani({ weight: ["300", "400", "500", "600", "700"], subsets
 export default function RulesPage() {
     const router = useRouter();
     const [accepted, setAccepted] = useState(false);
-    const { userName } = useGame();
+    const [showLoginModal, setShowLoginModal] = useState(false);
+    const [name, setName] = useState("");
+    const [password, setPassword] = useState("");
+    const [error, setError] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
+    const { userName, setUserName, isTeamBanned } = useGame();
+
+    const START_PASSWORD = "perceptron";
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        const trimmedName = name.trim();
+        if (isTeamBanned(trimmedName)) {
+            setError(`TEAM '${trimmedName.toUpperCase()}' IS DISQUALIFIED. ACCESS DENIED.`);
+            return;
+        }
+
+        setError("");
+        if (name.trim() && password === START_PASSWORD) {
+            setUserName(name.trim());
+            setIsLoading(true);
+
+            // Wait for 1.2 seconds for animation
+            await new Promise((resolve) => setTimeout(resolve, 1200));
+
+            // Request Fullscreen
+            try {
+                await document.documentElement.requestFullscreen();
+            } catch (err) {
+                console.log("Full screen request denied or failed:", err);
+            }
+
+            router.push("/questions");
+        } else if (password !== START_PASSWORD) {
+            setError("Incorrect password. Please ask the organizer for the start password.");
+        }
+    };
 
     return (
         <div className={`min-h-screen bg-black text-white flex flex-col items-center justify-center p-4 md:p-8 relative overflow-hidden selection:bg-red-900 selection:text-white`}>
+
+            {/* FULLSCREEN LOADING OVERLAY */}
+            {isLoading && (
+                <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black text-white overflow-hidden">
+                    <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-gray-900 via-black to-black opacity-80"></div>
+
+                    {/* Stars background effect */}
+                    <div className="absolute inset-0 z-0">
+                        <div className="absolute top-1/4 left-1/4 w-1 h-1 bg-white rounded-full animate-pulse"></div>
+                        <div className="absolute top-3/4 left-1/3 w-1 h-1 bg-white rounded-full animate-pulse delay-75"></div>
+                        <div className="absolute top-1/2 left-3/4 w-1 h-1 bg-white rounded-full animate-pulse delay-150"></div>
+                        <div className="absolute top-1/3 left-2/3 w-2 h-2 bg-white rounded-full animate-pulse delay-300"></div>
+                    </div>
+
+                    <div className="relative z-10 animate-[flyUp_1s_ease-in_forwards]">
+                        {/* Rocket SVG */}
+                        <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            className="w-24 h-24 md:w-32 md:h-32 text-white animate-[rumble_0.2s_linear_infinite]"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <path
+                                d="M12 2.5C12 2.5 7.5 8.5 7.5 13.5C7.5 17.5 9.5 19.5 12 19.5C14.5 19.5 16.5 17.5 16.5 13.5C16.5 8.5 12 2.5 12 2.5Z"
+                                fill="currentColor"
+                            />
+                            <path
+                                d="M7.5 13.5L5.5 15.5C4.5 16.5 5.5 18.5 7.5 18.5"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                            />
+                            <path
+                                d="M16.5 13.5L18.5 15.5C19.5 16.5 18.5 18.5 16.5 18.5"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                            />
+                            <circle cx="12" cy="10" r="2" fill="#ef4444" />
+                        </svg>
+
+                        {/* Flame */}
+                        <div className="absolute top-full left-1/2 -translate-x-1/2 w-4 h-12 bg-gradient-to-b from-red-500 via-orange-500 to-transparent rounded-full blur-sm animate-[flame_0.1s_linear_infinite]"></div>
+                    </div>
+
+                    <h2 className="mt-8 text-xl md:text-2xl font-mono tracking-[0.5em] text-white animate-pulse z-10">
+                        LAUNCHING...
+                    </h2>
+
+                    <style jsx>{`
+                        @keyframes rumble {
+                        0% { transform: translate(0, 0) rotate(0deg); }
+                        25% { transform: translate(-1px, 1px) rotate(-1deg); }
+                        50% { transform: translate(1px, -1px) rotate(1deg); }
+                        75% { transform: translate(-1px, -1px) rotate(0deg); }
+                        100% { transform: translate(1px, 1px) rotate(0deg); }
+                        }
+                        @keyframes flyUp {
+                        0% { transform: translateY(0); opacity: 1; }
+                        40% { transform: translateY(20px); }
+                        100% { transform: translateY(-100vh); opacity: 0; }
+                        }
+                        @keyframes flame {
+                        0% { height: 40px; opacity: 0.8; }
+                        50% { height: 60px; opacity: 1; }
+                        100% { height: 40px; opacity: 0.8; }
+                        }
+                    `}</style>
+                </div>
+            )}
 
             {/* Background Effects */}
             <div className="fixed inset-0 pointer-events-none opacity-20" style={{ backgroundImage: 'radial-gradient(#22c55e 1px, transparent 1px)', backgroundSize: '30px 30px' }}></div>
@@ -51,6 +160,7 @@ export default function RulesPage() {
                         title="PRECISION"
                         description="All answers are case-insensitive but spelling-sensitive. Read every clue with extreme care; details matter."
                     />
+
 
                     {/* Resource Grid for Better Readability */}
                     <div className="grid md:grid-cols-2 gap-4 my-2">
@@ -116,10 +226,9 @@ export default function RulesPage() {
                         {accepted ? (
                             <button
                                 onClick={() => {
-                                    document.documentElement.requestFullscreen().catch((err) => {
-                                        console.log("Full screen request denied:", err);
-                                    });
-                                    router.push("/questions");
+                                    if (accepted) {
+                                        setShowLoginModal(true);
+                                    }
                                 }}
                                 className="flex-1 md:flex-none w-full md:w-auto px-10 py-4 bg-green-600 hover:bg-green-500 text-black font-bold font-mono tracking-widest shadow-[0_0_20px_rgba(34,197,94,0.4)] transition-all animate-pulse cursor-pointer">
                                 START
@@ -137,6 +246,66 @@ export default function RulesPage() {
                     SECURED CONNECTION :: IP_LOGGED :: {new Date().getFullYear()}
                 </div>
             </div>
+
+            {/* Login Modal */}
+            {showLoginModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+                    {/* Close on click outside */}
+                    <div className="absolute inset-0" onClick={() => setShowLoginModal(false)}></div>
+
+                    <div className="relative w-full max-w-md p-8 bg-zinc-900/90 border border-green-500/30 rounded-2xl shadow-[0_0_50px_rgba(34,197,94,0.2)]" onClick={(e) => e.stopPropagation()}>
+                        <h2 className={`${orbitron.className} text-2xl font-bold mb-6 text-center text-white`}>AGENTS LOGIN</h2>
+                        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+                            <div className="space-y-2">
+                                <label className="text-zinc-400 font-mono text-sm uppercase">Team Name</label>
+                                <input
+                                    type="text"
+                                    placeholder="Enter identity..."
+                                    value={name}
+                                    onChange={(e) => setName(e.target.value)}
+                                    className="w-full px-6 py-4 bg-black/50 border border-zinc-700 rounded-xl text-white placeholder-zinc-600 focus:outline-none focus:border-green-500 transition-all font-mono"
+                                    required
+                                    autoFocus
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-zinc-400 font-mono text-sm uppercase">Password</label>
+                                <input
+                                    type="password"
+                                    placeholder="**********"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    className="w-full px-6 py-4 bg-black/50 border border-zinc-700 rounded-xl text-white placeholder-zinc-600 focus:outline-none focus:border-green-500 transition-all font-mono"
+                                    required
+                                />
+                            </div>
+
+                            {error && (
+                                <p className="text-red-500 text-sm font-mono text-center animate-pulse bg-red-900/10 p-2 rounded border border-red-500/20">
+                                    {'>'} ERROR: {error}
+                                </p>
+                            )}
+
+                            <div className="flex gap-4 mt-2">
+                                <button
+                                    type="button"
+                                    onClick={() => setShowLoginModal(false)}
+                                    className="flex-1 py-4 bg-zinc-800 hover:bg-zinc-700 text-zinc-400 font-bold font-mono rounded-xl transition-all"
+                                >
+                                    CANCEL
+                                </button>
+                                <button
+                                    type="submit"
+                                    className="flex-1 py-4 bg-green-600 hover:bg-green-500 text-black font-bold font-mono rounded-xl transition-all transform hover:scale-[1.02] shadow-lg shadow-green-500/20"
+                                >
+                                    ENTER
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
         </div>
     );
 }

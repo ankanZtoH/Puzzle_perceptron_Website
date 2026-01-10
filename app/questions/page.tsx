@@ -72,7 +72,8 @@ export default function QuestionsPage() {
         markClueUsed,
         setLevelsCleared,
         markQuestionSolved,
-        solvedQuestionIds
+        solvedQuestionIds,
+        disqualifyUser
     } = useGame(); // Use Global State
     const router = useRouter(); // Use Router
     const [currentLevelIndex, setCurrentLevelIndex] = useState(0);
@@ -95,6 +96,7 @@ export default function QuestionsPage() {
     // const [usedClues, setUsedClues] = useState<Record<number, ('easy' | 'hard' | 'skip')[]>>({}); // MOVED TO CONTEXT
     const [clueMessage, setClueMessage] = useState<React.ReactNode | null>(null);
     const [timeLeft, setTimeLeft] = useState(5400); // 90 minutes
+    const [showRules, setShowRules] = useState(false);
     const [isFullscreen, setIsFullscreen] = useState(true);
 
     const currentLevel = levels[currentLevelIndex];
@@ -121,10 +123,22 @@ export default function QuestionsPage() {
                 e.key === 'Escape'
             ) {
                 e.preventDefault();
-                // Optional: Show a warning or just silently block
+                if (!isGameComplete && !showLockdown) {
+                    disqualifyUser(userName);
+                    setShowLockdown(true);
+                }
             }
         };
         window.addEventListener('keydown', handleKeyDown);
+
+        // Tab Switch / Minimize Detection
+        const handleVisibilityChange = () => {
+            if (document.hidden && !isGameComplete && !showLockdown) {
+                disqualifyUser(userName);
+                setShowLockdown(true);
+            }
+        };
+        document.addEventListener("visibilitychange", handleVisibilityChange);
 
         // Warn on unload (Standard Browser Warning)
         const handleBeforeUnload = (e: BeforeUnloadEvent) => {
@@ -136,11 +150,12 @@ export default function QuestionsPage() {
         // Check fullscreen
         const checkFullscreen = () => {
             if (!document.fullscreenElement) {
+                // If they exit fullscreen manually (without Escape somehow, or browser UI), warn them.
+                // Escape key is caught above.
                 setIsFullscreen(false);
             } else {
                 setIsFullscreen(true);
                 // Attempt to lock keyboard (Chrome/Edge only)
-                // This prevents ESC from exiting fullscreen
                 const nav = navigator as any;
                 if (nav.keyboard && typeof nav.keyboard.lock === 'function') {
                     nav.keyboard.lock(['Escape'])
@@ -148,17 +163,22 @@ export default function QuestionsPage() {
                 }
             }
         };
-        document.addEventListener("fullscreenchange", checkFullscreen);
-        checkFullscreen(); // Initial check
 
+        // Listen for fullscreen change
+        document.addEventListener('fullscreenchange', checkFullscreen);
+
+        // Initial check
+        checkFullscreen();
 
         return () => {
             window.removeEventListener("popstate", handlePopState);
-            window.removeEventListener("keydown", handleKeyDown);
+            window.removeEventListener('keydown', handleKeyDown);
             window.removeEventListener("beforeunload", handleBeforeUnload);
-            document.removeEventListener("fullscreenchange", checkFullscreen);
+            document.removeEventListener("visibilitychange", handleVisibilityChange);
+            document.removeEventListener('fullscreenchange', checkFullscreen);
         };
-    }, [router, isGameComplete]);
+    }, [userName, disqualifyUser, isGameComplete, showLockdown]);
+
     // Check if already disqualified
 
 
@@ -213,24 +233,7 @@ export default function QuestionsPage() {
     const cleanString = (str: string) => str.replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
     const normalizeAnswer = (str: string) => str.trim().toLowerCase();
 
-    const handleValidate = (questionId: number) => {
-        const userAnswer = answers[questionId];
-        if (!userAnswer) return;
 
-        const question = currentLevel.questions.find(q => q.id === questionId);
-        if (!question) return;
-
-        const isCorrect = normalizeAnswer(userAnswer) === normalizeAnswer(question.a);
-
-        if (isCorrect) {
-            markQuestionSolved(questionId);
-        }
-
-        setValidationStatus(prev => ({
-            ...prev,
-            [questionId]: isCorrect ? 'correct' : 'incorrect'
-        }));
-    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -322,11 +325,29 @@ export default function QuestionsPage() {
             setShake(true);
             setShowError(true);
 
+            // VALIDATE ALL ANSWERS ON WRONG PASSWORD
+            const newValidationStatus: Record<number, 'correct' | 'incorrect' | null> = {};
+
+            currentLevel.questions.forEach(q => {
+                const userAnswer = answers[q.id];
+                if (userAnswer) {
+                    const isCorrect = normalizeAnswer(userAnswer) === normalizeAnswer(q.a);
+                    newValidationStatus[q.id] = isCorrect ? 'correct' : 'incorrect';
+
+                    if (isCorrect) {
+                        markQuestionSolved(q.id);
+                    }
+                }
+            });
+
+            setValidationStatus(prev => ({ ...prev, ...newValidationStatus }));
+
             // Increment guess count
             const newGuessCount = guessCount + 1;
             setGuessCount(newGuessCount);
 
-            if (newGuessCount >= 10) {
+            if (newGuessCount >= 5) {
+                disqualifyUser(userName); // Permanent disqualification
                 setShowLockdown(true);
                 // Wait for error animation to finish before showing lockdown
             } else {
@@ -438,6 +459,76 @@ export default function QuestionsPage() {
                 </div>
             )}
 
+            {/* RULES MODAL */}
+            {showRules && (
+                <div className="fixed inset-0 z-[260] flex items-center justify-center bg-black/90 backdrop-blur-md p-4 animate-in fade-in">
+                    <div className="bg-zinc-900 border border-zinc-700 p-8 rounded-xl max-w-4xl w-full h-[80vh] flex flex-col shadow-[0_0_50px_rgba(255,255,255,0.1)] relative">
+                        <button
+                            onClick={() => setShowRules(false)}
+                            className="absolute top-4 right-4 text-zinc-400 hover:text-white"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        </button>
+
+                        <h2 className="text-3xl font-bold mb-6 text-center text-white border-b border-zinc-700 pb-4 font-mono">MISSION PARAMETERS</h2>
+
+                        <div className="overflow-y-auto flex-1 pr-2 space-y-6 text-zinc-300 font-mono">
+                            <div className="bg-zinc-900/50 p-4 rounded border border-zinc-800">
+                                <h3 className="text-green-500 font-bold mb-2">01. ZERO TOLERANCE</h3>
+                                <p>External assistance, answer sharing, or Tab switch is strictly prohibited. Any violation will result in immediate disqualification.</p>
+                            </div>
+
+                            <div className="bg-zinc-900/50 p-4 rounded border border-zinc-800">
+                                <h3 className="text-green-500 font-bold mb-2">02. TIME CONSTRAINT</h3>
+                                <p>You have a strict 90-minute window to breach the system. The countdown begins immediately upon entry. Time is your scarcest resource.</p>
+                            </div>
+
+                            <div className="bg-zinc-900/50 p-4 rounded border border-zinc-800">
+                                <h3 className="text-green-500 font-bold mb-2">03. PRECISION</h3>
+                                <p>All answers are case-insensitive but spelling-sensitive. Read every clue with extreme care; details matter.</p>
+                            </div>
+
+                            <div className="grid md:grid-cols-2 gap-4">
+                                <div className="bg-zinc-900/50 p-4 rounded border border-zinc-800">
+                                    <h3 className="text-green-500 font-bold mb-2">04. RESOURCE MANAGEMENT</h3>
+                                    <div className="space-y-1 text-sm">
+                                        <div className="flex justify-between border-b border-zinc-700/50 pb-1"><span>Initial Balance:</span> <span className="text-green-400">300 Pts</span></div>
+                                        <div className="flex justify-between border-b border-zinc-700/50 pb-1"><span>Correct Answer:</span> <span className="text-green-400">+80 Pts</span></div>
+                                        <div className="flex justify-between text-zinc-400 pt-1"><span>Usage Costs:</span></div>
+                                        <div className="pl-4 space-y-1">
+                                            <div className="flex justify-between"><span>Easy Hint:</span> <span className="text-yellow-500">50 Pts</span></div>
+                                            <div className="flex justify-between"><span>Hard Hint:</span> <span className="text-orange-500">100 Pts</span></div>
+                                            <div className="flex justify-between"><span>Skip Level:</span> <span className="text-red-500">200 Pts</span></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="bg-zinc-900/50 p-4 rounded border border-zinc-800">
+                                    <h3 className="text-green-500 font-bold mb-2">05. TOKEN LIMITS</h3>
+                                    <div className="space-y-1 text-sm">
+                                        <div className="font-bold text-zinc-400">Level Allocations:</div>
+                                        <ul className="list-disc list-inside pl-2 space-y-1 text-zinc-300">
+                                            <li><span className="text-zinc-500">Levels 1-3:</span> 2 Easy / Level</li>
+                                            <li><span className="text-zinc-500">Levels 4-5:</span> 2 Easy + 2 Hard / Level</li>
+                                        </ul>
+                                        <div className="border-t border-zinc-700/50 pt-2 mt-2">
+                                            <span className="text-zinc-400">Global Limit:</span> 3 Skip tokens total.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button
+                            onClick={() => setShowRules(false)}
+                            className="mt-6 w-full py-4 bg-zinc-800 hover:bg-zinc-700 text-white font-bold font-mono tracking-widest rounded transition-all"
+                        >
+                            CLOSE
+                        </button>
+                    </div>
+                </div>
+            )}
+
             {/* LOCKDOWN MODAL (GAME OVER) */}
             {showLockdown && (
                 <div className="fixed inset-0 z-[300] flex items-center justify-center bg-red-950/90 backdrop-blur-md p-4 animate-in zoom-in duration-300">
@@ -495,7 +586,7 @@ export default function QuestionsPage() {
 
                         <div className="space-y-2 font-bold text-red-400 text-sm md:text-lg tracking-[0.2em] animate-pulse">
                             <p>{`> ENCRYPTION KEY MISMATCH`}</p>
-                            <p>{`> LOCKING DOWN SYSTEM... ATTEMPT ${guessCount}/10`}</p>
+                            <p>{`> LOCKING DOWN SYSTEM... ATTEMPT ${guessCount}/5`}</p>
                         </div>
 
                         <div className="mt-8">
@@ -546,6 +637,17 @@ export default function QuestionsPage() {
                         <span className="mr-2 text-xs md:text-base">T-MINUS</span>
                         {formatTime(timeLeft)}
                     </div>
+                </div>
+
+                {/* RULES BUTTON (Top Left) */}
+                <div className="absolute top-20 left-4 md:left-10 z-[60] flex flex-col md:flex-row gap-2 md:gap-4 items-start">
+                    <button
+                        onClick={() => setShowRules(true)}
+                        className="bg-black/80 hover:bg-zinc-900 text-zinc-300 hover:text-white px-4 py-2 text-sm md:text-base font-mono font-bold border border-zinc-700 hover:border-zinc-500 rounded transition-all flex items-center gap-2 backdrop-blur-sm"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                        RULES
+                    </button>
                 </div>
 
                 <div ref={scrollContainerRef} className="flex-1 overflow-y-auto p-4 md:p-8 scrollbar-hide">
@@ -656,21 +758,18 @@ export default function QuestionsPage() {
                                                         )}
                                                     </div>
 
-                                                    {/* VALIDATE BUTTON AREA - Right Side */}
-                                                    <div className="flex flex-col items-end gap-2 flex-shrink-0">
+                                                    {/* VALIDATE BUTTON AREA - Right Side (REMOVED BUTTON, ONLY STATUS) */}
+                                                    <div className="flex flex-col items-end gap-2 flex-shrink-0 min-h-[40px] justify-center">
                                                         {validationStatus[q.id] === 'correct' && (
-                                                            <span className="text-green-500 font-bold font-mono text-sm animate-pulse">✓ Right Answer</span>
+                                                            <div className="flex items-center gap-2 text-green-500 font-bold font-mono text-sm uppercase tracking-wider animate-pulse bg-green-500/10 px-3 py-1 rounded border border-green-500/30">
+                                                                <span>✓ Right Answer</span>
+                                                            </div>
                                                         )}
                                                         {validationStatus[q.id] === 'incorrect' && (
-                                                            <span className="text-red-500 font-bold font-mono text-sm animate-pulse">✗ Wrong Answer</span>
+                                                            <div className="flex items-center gap-2 text-red-500 font-bold font-mono text-sm uppercase tracking-wider animate-pulse bg-red-500/10 px-3 py-1 rounded border border-red-500/30">
+                                                                <span>✗ Wrong Answer</span>
+                                                            </div>
                                                         )}
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => handleValidate(q.id)}
-                                                            className="px-6 py-2 bg-zinc-800 text-zinc-300 border border-zinc-600 rounded hover:bg-zinc-700 font-mono text-sm uppercase tracking-wider whitespace-nowrap transition-all active:scale-95"
-                                                        >
-                                                            Validate
-                                                        </button>
                                                     </div>
                                                 </div>
 
@@ -701,7 +800,7 @@ export default function QuestionsPage() {
                                         </button>
                                     </div>
                                     <div className="text-center mt-2 text-red-800 font-mono text-xs">
-                                        ATTEMPTS: {guessCount}/10
+                                        ATTEMPTS: {guessCount}/5
                                     </div>
                                     {showEmptyError && (
                                         <div className="absolute left-0 right-0 -bottom-8 text-center text-red-500 font-mono font-bold text-xs md:text-sm animate-pulse tracking-wider">
